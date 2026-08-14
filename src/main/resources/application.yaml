@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: locadora_rdt_backend
