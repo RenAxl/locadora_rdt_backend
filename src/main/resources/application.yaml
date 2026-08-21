@@ -1,3 +1,6 @@
 spring:
   application:
     name: locadora_rdt_backend
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
