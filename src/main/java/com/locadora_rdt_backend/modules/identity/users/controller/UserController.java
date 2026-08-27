@@ -70,6 +70,7 @@ public class UserController {
     @PatchMapping("/{id}/active")
     public ResponseEntity<UserDTO> changeActive(@PathVariable Long id, @RequestBody boolean active) {
         service.changeActiveStatus(id, active);
+
         return ResponseEntity.noContent().build();
     }
 

@@ -144,7 +144,6 @@ public class UserServiceImpl implements UserService {
             int updated = repository.updateActiveById(id, active);
 
             if (updated == 0) {
-
                 throw new ResourceNotFoundException("Id not found ");
             }
 
