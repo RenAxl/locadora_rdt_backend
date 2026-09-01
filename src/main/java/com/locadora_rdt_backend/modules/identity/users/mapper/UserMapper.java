@@ -48,6 +48,20 @@ public class UserMapper {
 
         dto.setPhotoContentType(entity.getPhotoContentType());
 
+        dto.setRoles(
+                entity.getRoles()
+                        .stream()
+                        .map(role -> role.getAuthority())
+                        .collect(Collectors.toList())
+        );
+
+        dto.setRoleIds(
+                entity.getRoles()
+                        .stream()
+                        .map(role -> role.getId())
+                        .collect(Collectors.toList())
+        );
+
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
 
@@ -84,4 +98,3 @@ public class UserMapper {
         }
     }
 }
-

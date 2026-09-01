@@ -21,6 +21,7 @@ public class UserDetailsDTO implements Serializable {
     private String photoContentType;
 
     private List<String> roles;
+    private List<Long> roleIds;
 
     private Instant createdAt;
     private Instant updatedAt;
@@ -93,6 +94,14 @@ public class UserDetailsDTO implements Serializable {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 
     public Instant getCreatedAt() {

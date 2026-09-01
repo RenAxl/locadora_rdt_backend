@@ -37,6 +37,9 @@ public class UserUpdateDTO implements Serializable {
     @NotNull(message = "Campo requerido")
     private Address address;
 
+    @NotEmpty(message = "Informe pelo menos um perfil")
+    private List<Long> roleIds = new ArrayList<>();
+
     public UserUpdateDTO() {
     }
 
@@ -78,6 +81,14 @@ public class UserUpdateDTO implements Serializable {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 
 }

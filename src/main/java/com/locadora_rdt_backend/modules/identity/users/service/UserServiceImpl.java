@@ -6,6 +6,8 @@ import com.locadora_rdt_backend.modules.identity.users.dto.*;
 import com.locadora_rdt_backend.modules.identity.users.mapper.UserMapper;
 import com.locadora_rdt_backend.modules.identity.users.model.User;
 import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository;
+import com.locadora_rdt_backend.modules.identity.roles.model.Role;
+import com.locadora_rdt_backend.modules.identity.roles.service.RoleService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -23,13 +25,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final RoleService roleService;
 
     public UserServiceImpl(
             UserRepository repository,
-            UserMapper mapper
+            UserMapper mapper,
+            RoleService roleService
     ) {
         this.repository = repository;
         this.mapper = mapper;
+        this.roleService = roleService;
     }
 
     @Override
@@ -71,6 +76,11 @@ public class UserServiceImpl implements UserService {
 
         user.setCreatedBy("Usuário Teste");
 
+        for (Long roleId : dto.getRoleIds()) {
+            Role role = roleService.findEntityById(roleId);
+            user.getRoles().add(role);
+        }
+
         User savedUser = repository.save(user);
 
         UserDTO userDTO = mapper.toDTO(savedUser);
@@ -87,6 +97,13 @@ public class UserServiceImpl implements UserService {
             User user = repository.getOne(id);
 
             mapper.updateEntity(user, dto);
+
+            user.getRoles().clear();
+
+            for (Long roleId : dto.getRoleIds()) {
+                Role role = roleService.findEntityById(roleId);
+                user.getRoles().add(role);
+            }
 
             user.setUpdatedBy("Usuário Teste");
 

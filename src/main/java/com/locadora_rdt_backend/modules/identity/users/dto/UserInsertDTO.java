@@ -6,9 +6,12 @@ import com.locadora_rdt_backend.modules.identity.users.model.Address;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.Valid;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @UserInsertValid
 public class UserInsertDTO implements Serializable {
@@ -28,6 +31,9 @@ public class UserInsertDTO implements Serializable {
     @Valid
     @NotNull(message = "Campo requerido")
     private Address address;
+
+    @NotEmpty(message = "Informe pelo menos um perfil")
+    private List<Long> roleIds = new ArrayList<>();
 
     public UserInsertDTO() {
     }
@@ -62,6 +68,14 @@ public class UserInsertDTO implements Serializable {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 
 }
