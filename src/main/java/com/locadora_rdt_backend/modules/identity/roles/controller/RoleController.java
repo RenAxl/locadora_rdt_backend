@@ -9,9 +9,12 @@ import com.locadora_rdt_backend.shared.web.ControllerResponseBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import static com.locadora_rdt_backend.shared.constants.PermissionConstants.*;
 
 @RestController
 @RequestMapping(value = "/roles")
@@ -23,6 +26,7 @@ public class RoleController {
         this.service = service;
     }
 
+    @PreAuthorize(ROLE_READ)
     @GetMapping
     public ResponseEntity<Page<RoleDTO>> findAllPaged(
             @RequestParam(value = "authority", defaultValue = "") String authority,
@@ -38,12 +42,14 @@ public class RoleController {
         return ResponseEntity.ok().body(list);
     }
 
+    @PreAuthorize(ROLE_READ)
     @GetMapping(value = "/{id}")
     public ResponseEntity<RoleDetailsDTO> findById(@PathVariable Long id) {
         RoleDetailsDTO dto = service.findById(id);
         return ResponseEntity.ok().body(dto);
     }
 
+    @PreAuthorize(ROLE_WRITE)
     @PutMapping(value = "/{id}/permissions")
     public ResponseEntity<RoleDTO> updatePermissions(
             @PathVariable Long id,
@@ -53,6 +59,7 @@ public class RoleController {
         return ResponseEntity.ok().body(updated);
     }
 
+    @PreAuthorize(ROLE_WRITE)
     @PostMapping
     public ResponseEntity<RoleDTO> insert(@Valid @RequestBody RoleInsertDTO dto) {
         RoleDTO created = service.insert(dto);

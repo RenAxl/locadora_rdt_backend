@@ -54,7 +54,7 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toList());
 
         if (roleIds.isEmpty()) {
-            return page.map(role -> mapper.toDTO(role, RoleConstants.DEFAULT_PERMISSIONS_COUNT));
+            return page.map(role -> mapper.toDTO(role, 0L));
         }
 
         List<Object[]> rows = repository.countPermissionsByRoleIds(roleIds);

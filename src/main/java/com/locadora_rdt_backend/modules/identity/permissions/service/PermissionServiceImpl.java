@@ -1,7 +1,6 @@
 package com.locadora_rdt_backend.modules.identity.permissions.service;
 
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
-import com.locadora_rdt_backend.modules.identity.permissions.constants.PermissionConstants;
 import com.locadora_rdt_backend.modules.identity.permissions.dto.PermissionDTO;
 import com.locadora_rdt_backend.modules.identity.permissions.model.Permission;
 import com.locadora_rdt_backend.modules.identity.permissions.repository.PermissionRepository;
@@ -42,8 +41,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional(readOnly = true)
     public Permission findEntityById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        PermissionConstants.PERMISSION_NOT_FOUND
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("Permissão não encontrada"));
     }
 }

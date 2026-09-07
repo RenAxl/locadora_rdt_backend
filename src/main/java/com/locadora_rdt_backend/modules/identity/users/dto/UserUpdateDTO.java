@@ -1,5 +1,6 @@
 package com.locadora_rdt_backend.modules.identity.users.dto;
 
+import com.locadora_rdt_backend.modules.identity.users.constants.UserConstants;
 import com.locadora_rdt_backend.modules.identity.users.validation.UserUpdateValid;
 import com.locadora_rdt_backend.modules.identity.users.model.Address;
 
@@ -19,25 +20,26 @@ public class UserUpdateDTO implements Serializable {
 
     private Long id;
 
-    @Size(min = 3, max = 60, message = "O nome deve ter entre 5 a 60 caracteres")
-    @NotBlank(message = "Campo requerido")
+    @Size(min = UserConstants.NAME_MIN_LENGTH, max = UserConstants.NAME_MAX_LENGTH,
+            message = UserConstants.NAME_LENGTH)
+    @NotBlank(message = UserConstants.REQUIRED_FIELD)
     private String name;
 
-    @NotBlank(message = "Campo requerido")
-    @Email(message = "Favor informar um email válido")
+    @NotBlank(message = UserConstants.REQUIRED_FIELD)
+    @Email(message = UserConstants.INVALID_EMAIL)
     private String email;
 
-    @NotNull(message = "Campo requerido")
+    @NotNull(message = UserConstants.REQUIRED_FIELD)
     private Boolean active;
 
-    @NotBlank(message = "Campo requerido")
+    @NotBlank(message = UserConstants.REQUIRED_FIELD)
     private String telephone;
 
     @Valid
-    @NotNull(message = "Campo requerido")
+    @NotNull(message = UserConstants.REQUIRED_FIELD)
     private Address address;
 
-    @NotEmpty(message = "Informe pelo menos um perfil")
+    @NotEmpty(message = UserConstants.ROLES_REQUIRED)
     private List<Long> roleIds = new ArrayList<>();
 
     public UserUpdateDTO() {

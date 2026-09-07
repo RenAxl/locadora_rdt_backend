@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.config;
+package com.locadora_rdt_backend.config.cors;
 
 import java.util.Arrays;
 import java.util.List;

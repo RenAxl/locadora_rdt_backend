@@ -7,10 +7,13 @@ import com.locadora_rdt_backend.shared.web.ControllerResponseBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static com.locadora_rdt_backend.shared.constants.PermissionConstants.*;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -22,6 +25,7 @@ public class UserController {
         this.service = service;
     }
 
+    @PreAuthorize(USER_READ)
     @GetMapping
     public ResponseEntity<Page<UserDTO>> findAllPaged(
             @RequestParam(value = "name", defaultValue = "") String name,
@@ -37,36 +41,42 @@ public class UserController {
         return ResponseEntity.ok().body(list);
     }
 
+    @PreAuthorize(USER_READ)
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDetailsDTO> findById(@PathVariable Long id) {
         UserDetailsDTO userDto = service.findById(id);
         return ResponseEntity.ok().body(userDto);
     }
 
+    @PreAuthorize(USER_WRITE)
     @PostMapping
     public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserInsertDTO dto) {
         UserDTO userDto = service.insert(dto);
         return ControllerResponseBuilder.created(userDto.getId(), userDto);
     }
 
+    @PreAuthorize(USER_WRITE)
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         UserDTO userDto = service.update(id, dto);
         return ResponseEntity.ok().body(userDto);
     }
 
+    @PreAuthorize(USER_DELETE)
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize(USER_DELETE)
     @DeleteMapping("/all")
     public ResponseEntity<Void> deleteAll(@RequestBody List<Long> ids) {
         service.deleteAll(ids);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize(USER_WRITE)
     @PatchMapping("/{id}/active")
     public ResponseEntity<UserDTO> changeActive(@PathVariable Long id, @RequestBody boolean active) {
         service.changeActiveStatus(id, active);
@@ -74,6 +84,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize(USER_READ)
     @GetMapping(value = "/{id}/photo")
     public ResponseEntity<byte[]> getUserPhotoById(@PathVariable Long id) {
 

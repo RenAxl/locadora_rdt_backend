@@ -2,6 +2,7 @@ package com.locadora_rdt_backend.modules.identity.users.service;
 
 import com.locadora_rdt_backend.common.exception.DatabaseException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
+import com.locadora_rdt_backend.modules.identity.users.constants.UserConstants;
 import com.locadora_rdt_backend.modules.identity.users.dto.*;
 import com.locadora_rdt_backend.modules.identity.users.mapper.UserMapper;
 import com.locadora_rdt_backend.modules.identity.users.model.User;
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = repository.findById(id);
 
         if (!userOptional.isPresent()) {
-            throw new ResourceNotFoundException("Usuário Não encontrado");
+            throw new ResourceNotFoundException(UserConstants.USER_NOT_FOUND);
         }
 
         User user = userOptional.get();
@@ -74,7 +75,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(null);
         user.setActive(false);
 
-        user.setCreatedBy("Usuário Teste");
+        user.setCreatedBy(UserConstants.TEST_USER);
 
         for (Long roleId : dto.getRoleIds()) {
             Role role = roleService.findEntityById(roleId);
@@ -105,7 +106,7 @@ public class UserServiceImpl implements UserService {
                 user.getRoles().add(role);
             }
 
-            user.setUpdatedBy("Usuário Teste");
+            user.setUpdatedBy(UserConstants.TEST_USER);
 
             User savedUser = repository.save(user);
 
@@ -115,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (EntityNotFoundException e) {
 
-            throw new ResourceNotFoundException("Usuário Não encontrado");
+            throw new ResourceNotFoundException(UserConstants.USER_NOT_FOUND);
         }
     }
 
@@ -125,7 +126,7 @@ public class UserServiceImpl implements UserService {
         try {
             repository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResourceNotFoundException("Id não encontrado");
+            throw new ResourceNotFoundException(UserConstants.ID_NOT_FOUND);
         }
     }
 
@@ -134,7 +135,7 @@ public class UserServiceImpl implements UserService {
     public void deleteAll(List<Long> ids) {
 
         if (ids == null || ids.isEmpty()) {
-            throw new IllegalArgumentException("Lista de ids vazia");
+            throw new IllegalArgumentException(UserConstants.EMPTY_ID_LIST);
         }
 
         List<User> users = repository.findAllById(ids);
@@ -146,7 +147,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (existingIds.size() != ids.size()) {
-            throw new ResourceNotFoundException("Um ou mais IDs não existem");
+            throw new ResourceNotFoundException(UserConstants.ONE_OR_MORE_IDS_NOT_FOUND);
         }
 
         repository.deleteAllByIds(ids);
@@ -161,12 +162,12 @@ public class UserServiceImpl implements UserService {
             int updated = repository.updateActiveById(id, active);
 
             if (updated == 0) {
-                throw new ResourceNotFoundException("Id not found ");
+                throw new ResourceNotFoundException(UserConstants.ID_NOT_FOUND);
             }
 
         } catch (DataAccessException e) {
 
-            throw new DatabaseException("Erro ao alterar o status do usuário.");
+            throw new DatabaseException(UserConstants.STATUS_CHANGE_ERROR);
         }
     }
 
@@ -175,13 +176,13 @@ public class UserServiceImpl implements UserService {
     public UserPhotoDTO getUserPhotoById(Long id) {
 
         if (id == null) {
-            throw new IllegalArgumentException("O Id é nulo");
+            throw new IllegalArgumentException(UserConstants.NULL_ID);
         }
 
         Optional<User> userOptional = repository.findById(id);
 
         if (!userOptional.isPresent()) {
-            throw new ResourceNotFoundException("Usuário não encontrado");
+            throw new ResourceNotFoundException(UserConstants.USER_NOT_FOUND);
         }
 
         User user = userOptional.get();

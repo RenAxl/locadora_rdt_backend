@@ -9,10 +9,7 @@ public class RoleInsertDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = RoleConstants.AUTHORITY_REQUIRED)
-    @Size(
-            min = RoleConstants.AUTHORITY_MIN_LENGTH,
-            max = RoleConstants.AUTHORITY_MAX_LENGTH,
-            message = RoleConstants.AUTHORITY_LENGTH
+    @Size(min = RoleConstants.AUTHORITY_MIN_LENGTH, max = RoleConstants.AUTHORITY_MAX_LENGTH, message = RoleConstants.AUTHORITY_LENGTH
     )
     private String authority;
 
