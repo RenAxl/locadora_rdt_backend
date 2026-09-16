@@ -2,6 +2,7 @@ package com.locadora_rdt_backend.modules.identity.users.service;
 
 import com.locadora_rdt_backend.common.exception.DatabaseException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
+import com.locadora_rdt_backend.modules.identity.account_activation.service.AccountActivationService;
 import com.locadora_rdt_backend.modules.identity.users.constants.UserConstants;
 import com.locadora_rdt_backend.modules.identity.users.dto.*;
 import com.locadora_rdt_backend.modules.identity.users.mapper.UserMapper;
@@ -9,6 +10,7 @@ import com.locadora_rdt_backend.modules.identity.users.model.User;
 import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository;
 import com.locadora_rdt_backend.modules.identity.roles.model.Role;
 import com.locadora_rdt_backend.modules.identity.roles.service.RoleService;
+import com.locadora_rdt_backend.shared.security.AuthenticationFacade;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -27,15 +29,21 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final RoleService roleService;
+    private final AccountActivationService accountActivationService;
+    private final AuthenticationFacade authenticationFacade;
 
     public UserServiceImpl(
             UserRepository repository,
             UserMapper mapper,
-            RoleService roleService
+            RoleService roleService,
+            AccountActivationService accountActivationService,
+            AuthenticationFacade authenticationFacade
     ) {
         this.repository = repository;
         this.mapper = mapper;
         this.roleService = roleService;
+        this.accountActivationService = accountActivationService;
+        this.authenticationFacade = authenticationFacade;
     }
 
     @Override
@@ -75,7 +83,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(null);
         user.setActive(false);
 
-        user.setCreatedBy(UserConstants.TEST_USER);
+        user.setCreatedBy(authenticationFacade.getAuthenticatedUsername());
 
         for (Long roleId : dto.getRoleIds()) {
             Role role = roleService.findEntityById(roleId);
@@ -85,6 +93,9 @@ public class UserServiceImpl implements UserService {
         User savedUser = repository.save(user);
 
         UserDTO userDTO = mapper.toDTO(savedUser);
+
+        accountActivationService
+                .createActivationTokenAndSendEmail(savedUser);
 
         return userDTO;
     }
@@ -106,7 +117,7 @@ public class UserServiceImpl implements UserService {
                 user.getRoles().add(role);
             }
 
-            user.setUpdatedBy(UserConstants.TEST_USER);
+            user.setUpdatedBy(authenticationFacade.getAuthenticatedUsername());
 
             User savedUser = repository.save(user);
 

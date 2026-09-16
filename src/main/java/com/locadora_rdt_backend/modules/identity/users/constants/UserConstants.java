@@ -2,9 +2,6 @@ package com.locadora_rdt_backend.modules.identity.users.constants;
 
 public final class UserConstants {
 
-    // Valores padrão
-    public static final String TEST_USER = "Usuário Teste";
-
     // Validações
     public static final int NAME_MIN_LENGTH = 3;
     public static final int NAME_MAX_LENGTH = 60;
