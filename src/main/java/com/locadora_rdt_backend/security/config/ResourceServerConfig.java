@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.modules.identity.auth.security.config;
+package com.locadora_rdt_backend.security.config;
 
 import java.util.Arrays;
 

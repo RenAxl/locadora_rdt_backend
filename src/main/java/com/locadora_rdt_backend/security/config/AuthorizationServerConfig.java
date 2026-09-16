@@ -1,8 +1,8 @@
-package com.locadora_rdt_backend.modules.identity.auth.security.config;
+package com.locadora_rdt_backend.security.config;
 
 import java.util.Arrays;
 
-import com.locadora_rdt_backend.modules.identity.auth.security.jwt.JwtClaimsTokenEnhancer;
+import com.locadora_rdt_backend.security.jwt.JwtClaimsTokenEnhancer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 

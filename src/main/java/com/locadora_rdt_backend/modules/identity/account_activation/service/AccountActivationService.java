@@ -7,4 +7,6 @@ public interface AccountActivationService {
 
     void createActivationTokenAndSendEmail(User user);
 
+    void activateAccount (String token, AccountActivationDTO dto);
+
 }

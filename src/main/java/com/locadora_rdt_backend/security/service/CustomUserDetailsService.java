@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.modules.identity.auth.security.service;
+package com.locadora_rdt_backend.security.service;
 
 import com.locadora_rdt_backend.modules.identity.users.model.User;
 import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository;

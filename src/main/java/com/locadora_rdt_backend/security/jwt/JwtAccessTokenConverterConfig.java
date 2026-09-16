@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.modules.identity.auth.security.jwt;
+package com.locadora_rdt_backend.security.jwt;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

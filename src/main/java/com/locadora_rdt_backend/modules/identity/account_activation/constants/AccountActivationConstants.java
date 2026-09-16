@@ -8,7 +8,7 @@ public final class AccountActivationConstants {
     public static final int TOKEN_BYTES = 32;
 
     // Link e e-mail
-    public static final String ACTIVATION_PATH = "/auth/activate";
+    public static final String ACTIVATION_PATH = "/activate";
     public static final String TOKEN_QUERY_PARAM = "token";
     public static final String ACTIVATION_EMAIL_SUBJECT = "Ative sua conta - Locadora RDT";
 
