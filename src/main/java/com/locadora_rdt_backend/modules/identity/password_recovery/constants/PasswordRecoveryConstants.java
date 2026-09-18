@@ -7,7 +7,7 @@ public final class PasswordRecoveryConstants {
     public static final String TOKEN_MINUTES_PROPERTY = "${app.password-reset.token-minutes:30}";
 
     // Link e e-mail
-    public static final String PASSWORD_RESET_PATH = "/recovery-password/password-reset";
+    public static final String PASSWORD_RESET_PATH = "/password-recovery/password-reset";
     public static final String TOKEN_QUERY_PARAM = "token";
     public static final String PASSWORD_RESET_EMAIL_SUBJECT = "Recuperação de senha - Locadora RDT";
 

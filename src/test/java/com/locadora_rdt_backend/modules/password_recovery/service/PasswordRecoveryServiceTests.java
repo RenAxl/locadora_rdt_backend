@@ -91,7 +91,7 @@ public class PasswordRecoveryServiceTests {
 
     @Test
     void requestPasswordResetShouldSaveTokenAndSendEmail() {
-        String link = "http://localhost:4200/recovery?token=token-recuperacao";
+        String link = "http://localhost:4200/password-recovery/password-reset?token=token-recuperacao";
 
         when(userRepository.findByEmail(forgotPasswordDTO.getEmail())).thenReturn(user);
         when(identityTokenService.generateToken()).thenReturn("token-recuperacao");
