@@ -3,7 +3,7 @@ package com.locadora_rdt_backend.infrastructure.mail.template;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PasswordResetEmailTemplate {
+public class PasswordRecoveryEmailTemplate {
 
     public String buildTemplate(
             String name,

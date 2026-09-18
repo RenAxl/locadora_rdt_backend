@@ -2,13 +2,13 @@ package com.locadora_rdt_backend.modules.account_activation.service;
 
 import com.locadora_rdt_backend.infrastructure.mail.service.EmailService;
 import com.locadora_rdt_backend.infrastructure.mail.template.ActivationEmailTemplate;
-import com.locadora_rdt_backend.modules.identity.account_activation.constants.AccountActivationConstants;
 import com.locadora_rdt_backend.modules.identity.account_activation.mapper.AccountActivationMapper;
 import com.locadora_rdt_backend.modules.identity.account_activation.model.AccountActivation;
 import com.locadora_rdt_backend.modules.identity.account_activation.repository.AccountActivationRepository;
 import com.locadora_rdt_backend.modules.identity.account_activation.service.AccountActivationServiceImpl;
 import com.locadora_rdt_backend.modules.identity.users.model.User;
 import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository;
+import com.locadora_rdt_backend.shared.token.service.IdentityTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +50,9 @@ public class AccountActivationServiceTests {
     @Mock
     private ActivationEmailTemplate templateService;
 
+    @Mock
+    private IdentityTokenService identityTokenService;
+
     @InjectMocks
     private AccountActivationServiceImpl service;
 
@@ -74,28 +77,24 @@ public class AccountActivationServiceTests {
 
     @Test
     void createActivationTokenAndSendEmailShouldSaveTokenAndSendEmail() {
-        String html = "<p>Ative sua conta</p>";
+        String link = "https://locadora.example/activate?token=token-ativacao";
 
-        when(mapper.toEntity(eq(user), anyString(), any(Instant.class)))
+        when(identityTokenService.generateToken()).thenReturn("token-ativacao");
+        when(mapper.toEntity(eq(user), eq("token-ativacao"), any(Instant.class)))
                 .thenReturn(accountActivation);
-        when(templateService.buildTemplate(eq(user.getName()), anyString(), eq(30L)))
-                .thenReturn(html);
+        when(templateService.buildTemplate(user.getName(), link, 30L)).thenReturn("html");
 
         service.createActivationTokenAndSendEmail(user);
 
         verify(repository).deleteByUserId(user.getId());
         verify(repository).save(accountActivation);
-        verify(templateService).buildTemplate(eq(user.getName()), anyString(), eq(30L));
-        verify(emailService).sendHtmlEmail(
-                user.getEmail(),
-                AccountActivationConstants.ACTIVATION_EMAIL_SUBJECT,
-                html
-        );
+        verify(emailService).sendHtmlEmail(user.getEmail(), "Ative sua conta - Locadora RDT", "html");
     }
 
     @Test
     void createActivationTokenAndSendEmailShouldThrowExceptionWhenRepositoryFails() {
-        when(mapper.toEntity(eq(user), anyString(), any(Instant.class)))
+        when(identityTokenService.generateToken()).thenReturn("token-ativacao");
+        when(mapper.toEntity(eq(user), eq("token-ativacao"), any(Instant.class)))
                 .thenReturn(accountActivation);
         when(repository.save(accountActivation))
                 .thenThrow(new DataAccessResourceFailureException("Erro no banco"));

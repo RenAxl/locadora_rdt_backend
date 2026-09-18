@@ -9,16 +9,15 @@ import com.locadora_rdt_backend.modules.identity.account_activation.model.Accoun
 import com.locadora_rdt_backend.modules.identity.account_activation.repository.AccountActivationRepository;
 import com.locadora_rdt_backend.modules.identity.users.model.User;
 import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository;
+import com.locadora_rdt_backend.shared.token.service.IdentityTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -30,6 +29,7 @@ public class AccountActivationServiceImpl implements AccountActivationService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final ActivationEmailTemplate templateService;
+    private final IdentityTokenService identityTokenService;
 
     @Value(AccountActivationConstants.FRONTEND_BASE_URL_PROPERTY)
     private String frontendBaseUrl;
@@ -43,7 +43,8 @@ public class AccountActivationServiceImpl implements AccountActivationService {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             EmailService emailService,
-            ActivationEmailTemplate templateService
+            ActivationEmailTemplate templateService,
+            IdentityTokenService identityTokenService
     ) {
         this.repository = repository;
         this.mapper = mapper;
@@ -51,17 +52,14 @@ public class AccountActivationServiceImpl implements AccountActivationService {
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.templateService = templateService;
+        this.identityTokenService = identityTokenService;
     }
 
     @Override
     @Transactional
     public void createActivationTokenAndSendEmail(User user) {
 
-        byte[] tokenBytes = new byte[AccountActivationConstants.TOKEN_BYTES];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(tokenBytes);
-
-        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+        String token = identityTokenService.generateToken();
 
         Instant expiration = Instant.now().plus(tokenMinutes, ChronoUnit.MINUTES);
 
