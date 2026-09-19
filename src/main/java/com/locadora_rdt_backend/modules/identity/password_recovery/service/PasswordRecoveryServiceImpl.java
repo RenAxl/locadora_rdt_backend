@@ -111,9 +111,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             throw new IllegalArgumentException(PasswordRecoveryConstants.INVALID_TOKEN);
         }
 
-        if (dto == null
-                || dto.getPassword() == null
-                || dto.getPassword().isBlank()) {
+        if (dto == null || dto.getPassword() == null || dto.getPassword().isBlank()) {
 
             throw new IllegalArgumentException(PasswordRecoveryConstants.INVALID_PASSWORD);
         }

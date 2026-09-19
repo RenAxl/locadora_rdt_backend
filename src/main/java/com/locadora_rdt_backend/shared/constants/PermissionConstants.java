@@ -9,6 +9,8 @@ public class PermissionConstants {
     public static final String USER_READ = "hasAuthority('USER_READ')";
     public static final String USER_WRITE = "hasAuthority('USER_WRITE')";
     public static final String USER_DELETE = "hasAuthority('USER_DELETE')";
+    public static final String USER_PROFILE_READ = "hasAuthority('USER_PROFILE_READ')";
+    public static final String USER_PROFILE_WRITE = "hasAuthority('USER_PROFILE_WRITE')";
 
     // roles
     public static final String ROLE_READ = "hasAuthority('ROLE_READ')";
