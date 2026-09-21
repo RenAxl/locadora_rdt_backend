@@ -19,4 +19,8 @@ public class PermissionConstants {
     // permissions
     public static final String PERMISSION_READ = "hasAuthority('PERMISSION_READ')";
 
+    // system_settings
+    public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
+    public static final String SYSTEM_SETTING_WRITE = "hasAuthority('SYSTEM_SETTING_WRITE')";
+
 }
