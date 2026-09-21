@@ -9,6 +9,8 @@ public class SystemSettingDTO implements Serializable {
 
     private Long id;
     private String companyName;
+    private String icon;
+
     private Address address;
 
     public SystemSettingDTO() {
@@ -28,6 +30,14 @@ public class SystemSettingDTO implements Serializable {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public Address getAddress() {

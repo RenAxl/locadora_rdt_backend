@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 public class SystemSettingUpdateDTO implements Serializable {
@@ -16,6 +17,9 @@ public class SystemSettingUpdateDTO implements Serializable {
             message = SystemSettingConstants.COMPANY_NAME_MAX_LENGTH_MESSAGE)
     @NotBlank(message = SystemSettingConstants.COMPANY_NAME_REQUIRED)
     private String companyName;
+
+    @Pattern(regexp = SystemSettingConstants.ICON_PATTERN, message = SystemSettingConstants.INVALID_ICON)
+    private String icon;
 
     @Valid
     @NotNull(message = SystemSettingConstants.ADDRESS_REQUIRED)
@@ -30,6 +34,14 @@ public class SystemSettingUpdateDTO implements Serializable {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public Address getAddress() {

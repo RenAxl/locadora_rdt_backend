@@ -1,6 +1,7 @@
 package com.locadora_rdt_backend.modules.settings.system_settings.mapper;
 
 import com.locadora_rdt_backend.modules.settings.system_settings.dto.SystemSettingDTO;
+import com.locadora_rdt_backend.modules.settings.system_settings.constants.SystemSettingConstants;
 import com.locadora_rdt_backend.modules.settings.system_settings.dto.SystemSettingUpdateDTO;
 import com.locadora_rdt_backend.modules.settings.system_settings.model.SystemSetting;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,11 @@ public class SystemSettingMapper {
         dto.setId(entity.getId());
         dto.setCompanyName(entity.getCompanyName());
         dto.setAddress(entity.getAddress());
+        dto.setIcon(entity.getIcon());
+
+        if (dto.getIcon() == null) {
+            dto.setIcon(SystemSettingConstants.DEFAULT_ICON);
+        }
 
         return dto;
     }
@@ -26,5 +32,9 @@ public class SystemSettingMapper {
 
         entity.setCompanyName(dto.getCompanyName());
         entity.setAddress(dto.getAddress());
+
+        if (dto.getIcon() != null) {
+            entity.setIcon(dto.getIcon());
+        }
     }
 }

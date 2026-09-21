@@ -31,6 +31,9 @@ public class SystemSetting implements Serializable {
     @Column(name = "company_name", nullable = false, length = 120)
     private String companyName;
 
+    @Column(name = "icon", length = 40)
+    private String icon = SystemSettingConstants.DEFAULT_ICON;
+
     @Embedded
     private Address address;
 
@@ -85,6 +88,14 @@ public class SystemSetting implements Serializable {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public Address getAddress() {

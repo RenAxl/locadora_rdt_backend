@@ -7,6 +7,21 @@ public final class SystemSettingConstants {
     public static final String DEFAULT_COMPANY_NAME = "Locadora RDT";
     public static final String SYSTEM_USER = "SYSTEM";
 
+    public static final String DEFAULT_ICON = "fa-gamepad";
+    public static final String ICON_PATTERN =
+            "fa-(gamepad|store|car|screwdriver-wrench|building|film"
+                    + "|house|truck|motorcycle|bicycle|bus|plane"
+                    + "|ship|desktop|laptop|mobile-screen-button|camera|music"
+                    + "|headphones|tv|book|graduation-cap|utensils|mug-hot"
+                    + "|cart-shopping|bag-shopping|gift|star|heart|futbol"
+                    + "|dumbbell|tree|leaf|briefcase|gear|box"
+                    + "|headset|vr-cardboard|ghost|robot"
+                    + "|dragon|dice-d20|dice|trophy"
+                    + "|crosshairs|shield-halved|bolt|puzzle-piece"
+                    + "|chess-knight|rocket|skull|coins"
+                    + "|playstation|xbox)";
+    public static final String INVALID_ICON = "Selecione um ícone válido";
+
     // Validações
     public static final int COMPANY_NAME_MAX_LENGTH = 120;
     public static final String COMPANY_NAME_REQUIRED = "Nome da locadora é obrigatório";
