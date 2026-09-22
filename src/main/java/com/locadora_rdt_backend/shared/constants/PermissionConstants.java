@@ -12,6 +12,11 @@ public class PermissionConstants {
     public static final String USER_PROFILE_READ = "hasAuthority('USER_PROFILE_READ')";
     public static final String USER_PROFILE_WRITE = "hasAuthority('USER_PROFILE_WRITE')";
 
+    // customers
+    public static final String CUSTOMER_READ = "hasAuthority('CUSTOMER_READ')";
+    public static final String CUSTOMER_WRITE = "hasAuthority('CUSTOMER_WRITE')";
+    public static final String CUSTOMER_DELETE = "hasAuthority('CUSTOMER_DELETE')";
+
     // roles
     public static final String ROLE_READ = "hasAuthority('ROLE_READ')";
     public static final String ROLE_WRITE = "hasAuthority('ROLE_WRITE')";
