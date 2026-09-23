@@ -11,11 +11,14 @@ import com.locadora_rdt_backend.modules.identity.users.repository.UserRepository
 import com.locadora_rdt_backend.modules.identity.roles.model.Role;
 import com.locadora_rdt_backend.modules.identity.roles.service.RoleService;
 import com.locadora_rdt_backend.shared.security.AuthenticationFacade;
+import com.locadora_rdt_backend.modules.identity.account_activation.repository.AccountActivationRepository;
+import com.locadora_rdt_backend.modules.identity.password_recovery.repository.PasswordRecoveryRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -26,6 +29,8 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final AccountActivationRepository activationRepository;
+    private final PasswordRecoveryRepository recoveryRepository;
     private final UserRepository repository;
     private final UserMapper mapper;
     private final RoleService roleService;
@@ -37,8 +42,12 @@ public class UserServiceImpl implements UserService {
             UserMapper mapper,
             RoleService roleService,
             AccountActivationService accountActivationService,
-            AuthenticationFacade authenticationFacade
+            AuthenticationFacade authenticationFacade,
+            AccountActivationRepository activationRepository,
+            PasswordRecoveryRepository recoveryRepository
     ) {
+        this.activationRepository = activationRepository;
+        this.recoveryRepository = recoveryRepository;
         this.repository = repository;
         this.mapper = mapper;
         this.roleService = roleService;
@@ -134,6 +143,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void delete(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(UserConstants.ID_NOT_FOUND));
+        validateDeletion(user);
+        deleteTokens(user);
         try {
             repository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -161,7 +174,21 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException(UserConstants.ONE_OR_MORE_IDS_NOT_FOUND);
         }
 
-        repository.deleteAllByIds(ids);
+        users.forEach(this::validateDeletion);
+        users.forEach(this::deleteTokens);
+        repository.deleteAll(users);
+    }
+
+    private void deleteTokens(User user) {
+        activationRepository.deleteByUserId(user.getId());
+        recoveryRepository.deleteByUserId(user.getId());
+    }
+
+    private void validateDeletion(User user) {
+        if (user.getRoles().stream().anyMatch(role ->
+                "ROLE_ADMINISTRADOR".equals(role.getAuthority()))) {
+            throw new AccessDeniedException("Usuários com a role ROLE_ADMINISTRADOR não podem ser excluídos.");
+        }
     }
 
     @Override

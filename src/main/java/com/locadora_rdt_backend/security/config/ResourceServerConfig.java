@@ -36,6 +36,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/auth/activate").permitAll()
                 .antMatchers(HttpMethod.POST, "/auth/request-password-reset").permitAll()
                 .antMatchers(HttpMethod.POST, "/auth/password-reset").permitAll()
+                .antMatchers(HttpMethod.POST,
+                        "/customer-accounts",
+                        "/customer-accounts/create-password",
+                        "/customer-accounts/resend-activation").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()

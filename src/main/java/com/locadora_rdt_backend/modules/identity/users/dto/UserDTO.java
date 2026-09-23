@@ -3,10 +3,22 @@ package com.locadora_rdt_backend.modules.identity.users.dto;
 import com.locadora_rdt_backend.modules.identity.users.model.Address;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class UserDTO implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private List<String> roles = new ArrayList<>();
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 
     private Long id;
     private String name;

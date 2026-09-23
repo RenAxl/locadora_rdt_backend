@@ -23,5 +23,7 @@ public interface PasswordRecoveryRepository extends JpaRepository<PasswordRecove
             @Param("now") Instant now
     );
 
+    void deleteByUserId(Long userId);
+
     void deleteByUserIdAndType(Long userId, TokenType type);
 }

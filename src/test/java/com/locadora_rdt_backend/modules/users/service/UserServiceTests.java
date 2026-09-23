@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,6 +45,18 @@ public class UserServiceTests {
 
     @Mock
     private UserMapper mapper;
+
+    @Mock
+    private com.locadora_rdt_backend.shared.security.AuthenticationFacade authenticationFacade;
+
+    @Mock
+    private com.locadora_rdt_backend.modules.identity.account_activation.service.AccountActivationService activationService;
+
+    @Mock
+    private com.locadora_rdt_backend.modules.identity.account_activation.repository.AccountActivationRepository activationRepository;
+
+    @Mock
+    private com.locadora_rdt_backend.modules.identity.password_recovery.repository.PasswordRecoveryRepository recoveryRepository;
 
     @InjectMocks
     private UserServiceImpl service;
@@ -114,6 +124,7 @@ public class UserServiceTests {
 
     @Test
     void insertShouldSaveUser() {
+        when(authenticationFacade.getAuthenticatedUsername()).thenReturn("Usuário Teste");
         UserInsertDTO insertDTO = new UserInsertDTO();
         user.setPassword("senha");
 
@@ -131,6 +142,7 @@ public class UserServiceTests {
 
     @Test
     void insertShouldThrowExceptionWhenRepositoryFails() {
+        when(authenticationFacade.getAuthenticatedUsername()).thenReturn("Usuário Teste");
         UserInsertDTO insertDTO = new UserInsertDTO();
 
         when(mapper.toEntity(insertDTO)).thenReturn(user);
@@ -142,6 +154,7 @@ public class UserServiceTests {
 
     @Test
     void updateShouldUpdateUser() {
+        when(authenticationFacade.getAuthenticatedUsername()).thenReturn("Usuário Teste");
         UserUpdateDTO updateDTO = new UserUpdateDTO();
 
         when(repository.getOne(1L)).thenReturn(user);
@@ -165,14 +178,17 @@ public class UserServiceTests {
 
     @Test
     void deleteShouldDeleteUser() {
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
         service.delete(1L);
 
+        verify(activationRepository).deleteByUserId(1L);
+        verify(recoveryRepository).deleteByUserId(1L);
         verify(repository).deleteById(1L);
     }
 
     @Test
     void deleteShouldThrowExceptionWhenIdDoesNotExist() {
-        doThrow(new EmptyResultDataAccessException(1)).when(repository).deleteById(1L);
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(1L));
     }
@@ -181,13 +197,15 @@ public class UserServiceTests {
     void deleteAllShouldDeleteAllUsers() {
         User segundoUsuario = new User();
         segundoUsuario.setId(2L);
+        addRole(user, "ROLE_CLIENTE");
+        addRole(segundoUsuario, "ROLE_CUSTOMIZADA");
 
         when(repository.findAllById(Arrays.asList(1L, 2L)))
                 .thenReturn(Arrays.asList(user, segundoUsuario));
 
         service.deleteAll(Arrays.asList(1L, 2L));
 
-        verify(repository).deleteAllByIds(Arrays.asList(1L, 2L));
+        verify(repository).deleteAll(Arrays.asList(user, segundoUsuario));
     }
 
     @Test
@@ -195,7 +213,55 @@ public class UserServiceTests {
         assertThrows(IllegalArgumentException.class,
                 () -> service.deleteAll(Collections.emptyList()));
 
-        verify(repository, never()).deleteAllByIds(any());
+        verify(repository, never()).deleteAll(any(Iterable.class));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"ROLE_CLIENTE", "ROLE_GERENTE", "ROLE_CUSTOMIZADA"})
+    void deleteAllowsAnyNonAdministratorRole(String authority) {
+        addRole(user, authority);
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        service.delete(1L);
+        verify(activationRepository).deleteByUserId(1L);
+        verify(recoveryRepository).deleteByUserId(1L);
+        verify(repository).deleteById(1L);
+    }
+
+    @Test
+    void deleteRejectsAdministratorEvenWithOtherRoles() {
+        addRole(user, "ROLE_CLIENTE");
+        addRole(user, "ROLE_ADMINISTRADOR");
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> service.delete(1L));
+        verify(repository, never()).deleteById(any());
+        org.mockito.Mockito.verifyNoInteractions(activationRepository, recoveryRepository);
+    }
+
+    @Test
+    void deleteAllRejectsEntireBatchContainingAdministrator() {
+        User administrator = new User();
+        administrator.setId(2L);
+        addRole(administrator, "ROLE_ADMINISTRADOR");
+        when(repository.findAllById(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(user, administrator));
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> service.deleteAll(Arrays.asList(1L, 2L)));
+        verify(repository, never()).deleteAll(any(Iterable.class));
+        verify(repository, never()).deleteById(any());
+        org.mockito.Mockito.verifyNoInteractions(activationRepository, recoveryRepository);
+    }
+
+    @Test
+    void listIncludesRolesForDeletionProtection() {
+        addRole(user, "ROLE_ADMINISTRADOR");
+        assertEquals(Collections.singletonList("ROLE_ADMINISTRADOR"), new UserMapper().toDTO(user).getRoles());
+    }
+
+    private void addRole(User target, String authority) {
+        com.locadora_rdt_backend.modules.identity.roles.model.Role role =
+                new com.locadora_rdt_backend.modules.identity.roles.model.Role();
+        role.setId((long) target.getRoles().size() + 1);
+        role.setAuthority(authority);
+        target.getRoles().add(role);
     }
 
     @Test
