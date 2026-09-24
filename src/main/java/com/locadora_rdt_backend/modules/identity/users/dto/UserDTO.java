@@ -3,30 +3,31 @@ package com.locadora_rdt_backend.modules.identity.users.dto;
 import com.locadora_rdt_backend.modules.identity.users.model.Address;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
-import java.util.ArrayList;
-
 
 public class UserDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private List<String> roles = new ArrayList<>();
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
     private Long id;
     private String name;
     private String email;
+
     private Boolean active;
+
     private String telephone;
-    private String photoContentType;
     private Address address;
+
+    private String photoContentType;
+
+    private List<String> roles;
+    private List<Long> roleIds;
+
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private String createdBy;
+    private String updatedBy;
 
     public UserDTO() {
     }
@@ -71,14 +72,6 @@ public class UserDTO implements Serializable {
         this.telephone = telephone;
     }
 
-    public String getPhotoContentType() {
-        return photoContentType;
-    }
-
-    public void setPhotoContentType(String photoContentType) {
-        this.photoContentType = photoContentType;
-    }
-
     public Address getAddress() {
         return address;
     }
@@ -87,5 +80,60 @@ public class UserDTO implements Serializable {
         this.address = address;
     }
 
-}
+    public String getPhotoContentType() {
+        return photoContentType;
+    }
 
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+}

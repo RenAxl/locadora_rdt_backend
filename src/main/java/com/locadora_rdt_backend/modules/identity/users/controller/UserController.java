@@ -43,8 +43,8 @@ public class UserController {
 
     @PreAuthorize(USER_READ)
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserDetailsDTO> findById(@PathVariable Long id) {
-        UserDetailsDTO userDto = service.findById(id);
+    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+        UserDTO userDto = service.findById(id);
         return ResponseEntity.ok().body(userDto);
     }
 

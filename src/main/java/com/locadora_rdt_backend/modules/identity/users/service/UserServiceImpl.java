@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetailsDTO findById(Long id) {
+    public UserDTO findById(Long id) {
 
         Optional<User> userOptional = repository.findById(id);
 
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userOptional.get();
 
-        UserDetailsDTO userDTO = mapper.toDetailsDTO(user);
+        UserDTO userDTO = mapper.toDTO(user);
 
         return userDTO;
     }

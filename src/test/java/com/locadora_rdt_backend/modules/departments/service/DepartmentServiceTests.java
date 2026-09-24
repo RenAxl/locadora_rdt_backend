@@ -4,7 +4,6 @@ import com.locadora_rdt_backend.common.exception.DatabaseException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import com.locadora_rdt_backend.modules.organization.departments.constants.DepartmentConstants;
 import com.locadora_rdt_backend.modules.organization.departments.dto.DepartmentDTO;
-import com.locadora_rdt_backend.modules.organization.departments.dto.DepartmentDetailsDTO;
 import com.locadora_rdt_backend.modules.organization.departments.dto.DepartmentInsertDTO;
 import com.locadora_rdt_backend.modules.organization.departments.dto.DepartmentUpdateDTO;
 import com.locadora_rdt_backend.modules.organization.departments.mapper.DepartmentMapper;
@@ -121,13 +120,13 @@ public class DepartmentServiceTests {
 
     @Test
     void findByIdShouldReturnDepartment() {
-        DepartmentDetailsDTO detailsDTO = new DepartmentDetailsDTO();
+        DepartmentDTO detailsDTO = new DepartmentDTO();
         detailsDTO.setId(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(department));
-        when(mapper.toDetailsDTO(department)).thenReturn(detailsDTO);
+        when(mapper.toDTO(department)).thenReturn(detailsDTO);
 
-        DepartmentDetailsDTO resultado = service.findById(1L);
+        DepartmentDTO resultado = service.findById(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
@@ -141,7 +140,7 @@ public class DepartmentServiceTests {
                 () -> service.findById(1L));
 
         assertEquals(DepartmentConstants.DEPARTMENT_NOT_FOUND, exception.getMessage());
-        verify(mapper, never()).toDetailsDTO(any());
+        verify(mapper, never()).toDTO(any());
     }
 
     @Test

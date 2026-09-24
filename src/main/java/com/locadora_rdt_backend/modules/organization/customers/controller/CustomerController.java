@@ -44,8 +44,8 @@ public class CustomerController {
 
     @PreAuthorize(CUSTOMER_READ)
     @GetMapping(value = "/{id}")
-    public ResponseEntity<CustomerDetailsDTO> findById(@PathVariable Long id) {
-        CustomerDetailsDTO customerDto = service.findById(id);
+    public ResponseEntity<CustomerDTO> findById(@PathVariable Long id) {
+        CustomerDTO customerDto = service.findById(id);
         return ResponseEntity.ok().body(customerDto);
     }
 

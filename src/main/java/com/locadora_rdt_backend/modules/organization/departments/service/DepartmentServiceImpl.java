@@ -54,7 +54,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public DepartmentDetailsDTO findById(Long id) {
+    public DepartmentDTO findById(Long id) {
 
         Optional<Department> departmentOptional = repository.findById(id);
 
@@ -64,7 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         Department department = departmentOptional.get();
 
-        DepartmentDetailsDTO departmentDTO = mapper.toDetailsDTO(department);
+        DepartmentDTO departmentDTO = mapper.toDTO(department);
 
         return departmentDTO;
     }

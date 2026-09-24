@@ -9,7 +9,7 @@ public interface DepartmentService {
 
     Page<DepartmentDTO> findAllPaged(String name, PageRequest pageRequest);
 
-    DepartmentDetailsDTO findById(Long id);
+    DepartmentDTO findById(Long id);
 
     DepartmentDTO insert(DepartmentInsertDTO dto);
 

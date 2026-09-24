@@ -1,7 +1,6 @@
 package com.locadora_rdt_backend.modules.identity.roles.controller;
 
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDTO;
-import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleInsertDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RolePermissionsUpdateDTO;
 import com.locadora_rdt_backend.modules.identity.roles.service.RoleService;
@@ -44,8 +43,8 @@ public class RoleController {
 
     @PreAuthorize(ROLE_READ)
     @GetMapping(value = "/{id}")
-    public ResponseEntity<RoleDetailsDTO> findById(@PathVariable Long id) {
-        RoleDetailsDTO dto = service.findById(id);
+    public ResponseEntity<RoleDTO> findById(@PathVariable Long id) {
+        RoleDTO dto = service.findById(id);
         return ResponseEntity.ok().body(dto);
     }
 

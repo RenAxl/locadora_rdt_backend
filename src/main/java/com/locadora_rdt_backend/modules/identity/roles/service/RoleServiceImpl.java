@@ -3,7 +3,6 @@ package com.locadora_rdt_backend.modules.identity.roles.service;
 import com.locadora_rdt_backend.common.exception.DatabaseException;
 import com.locadora_rdt_backend.modules.identity.roles.constants.RoleConstants;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDTO;
-import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleInsertDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RolePermissionsUpdateDTO;
 import com.locadora_rdt_backend.modules.identity.permissions.model.Permission;
@@ -74,11 +73,11 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public RoleDetailsDTO findById(Long id) {
+    public RoleDTO findById(Long id) {
         Role entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(RoleConstants.ROLE_NOT_FOUND));
 
-        return mapper.toDetailsDTO(entity);
+        return mapper.toDTO(entity);
     }
 
     @Override

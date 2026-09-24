@@ -2,7 +2,6 @@ package com.locadora_rdt_backend.modules.organization.customers.service;
 
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerPhotoDTO;
-import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDetailsDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerInsertDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerUpdateDTO;
 import com.locadora_rdt_backend.modules.organization.customers.model.Customer;
@@ -16,7 +15,7 @@ public interface CustomerService {
 
     Page<CustomerDTO> findAllPaged(String name, PageRequest pageRequest);
 
-    CustomerDetailsDTO findById(Long id);
+    CustomerDTO findById(Long id);
 
     CustomerDTO insert(CustomerInsertDTO dto);
 

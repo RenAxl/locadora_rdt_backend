@@ -3,6 +3,7 @@ package com.locadora_rdt_backend.modules.identity.roles.dto;
 import com.locadora_rdt_backend.modules.identity.permissions.dto.PermissionDTO;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,12 @@ public class RoleDTO implements Serializable {
     private Long permissionsCount;
 
     private List<PermissionDTO> permissions = new ArrayList<>();
+
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private String createdBy;
+    private String updatedBy;
 
     public RoleDTO() {
     }
@@ -50,4 +57,35 @@ public class RoleDTO implements Serializable {
         this.permissions = permissions;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 }

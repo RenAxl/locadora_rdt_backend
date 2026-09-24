@@ -41,8 +41,8 @@ public class DepartmentController {
 
     @PreAuthorize(DEPARTMENT_READ)
     @GetMapping(value = "/{id}")
-    public ResponseEntity<DepartmentDetailsDTO> findById(@PathVariable Long id) {
-        DepartmentDetailsDTO departmentDto = service.findById(id);
+    public ResponseEntity<DepartmentDTO> findById(@PathVariable Long id) {
+        DepartmentDTO departmentDto = service.findById(id);
         return ResponseEntity.ok().body(departmentDto);
     }
 

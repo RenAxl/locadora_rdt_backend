@@ -1,7 +1,6 @@
 package com.locadora_rdt_backend.modules.organization.customers.mapper;
 
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDTO;
-import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDetailsDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerInsertDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerUpdateDTO;
 import com.locadora_rdt_backend.modules.organization.customers.model.Customer;
@@ -16,21 +15,6 @@ public class CustomerMapper {
     public CustomerDTO toDTO(Customer entity) {
 
         CustomerDTO dto = new CustomerDTO();
-
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setCpf(entity.getCpf());
-        dto.setEmail(entity.getEmail());
-        dto.setPhone(entity.getPhone());
-        dto.setAddress(entity.getAddress());
-        dto.setActive(entity.getActive());
-
-        return dto;
-    }
-
-    public CustomerDetailsDTO toDetailsDTO(Customer entity) {
-
-        CustomerDetailsDTO dto = new CustomerDetailsDTO();
 
         dto.setId(entity.getId());
         dto.setName(entity.getName());

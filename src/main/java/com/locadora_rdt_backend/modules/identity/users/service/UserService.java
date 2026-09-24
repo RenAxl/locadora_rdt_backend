@@ -10,7 +10,7 @@ public interface UserService {
 
     Page<UserDTO> findAllPaged(String name, PageRequest pageRequest);
 
-    UserDetailsDTO findById(Long id);
+    UserDTO findById(Long id);
 
     UserDTO insert(UserInsertDTO dto);
 

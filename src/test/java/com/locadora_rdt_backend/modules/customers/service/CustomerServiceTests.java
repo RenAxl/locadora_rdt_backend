@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDTO;
-import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerDetailsDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerInsertDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerPhotoDTO;
 import com.locadora_rdt_backend.modules.organization.customers.dto.CustomerUpdateDTO;
@@ -105,13 +104,13 @@ public class CustomerServiceTests {
 
     @Test
     void findByIdShouldReturnCustomer() {
-        CustomerDetailsDTO detailsDTO = new CustomerDetailsDTO();
+        CustomerDTO detailsDTO = new CustomerDTO();
         detailsDTO.setId(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(customer));
-        when(mapper.toDetailsDTO(customer)).thenReturn(detailsDTO);
+        when(mapper.toDTO(customer)).thenReturn(detailsDTO);
 
-        CustomerDetailsDTO resultado = service.findById(1L);
+        CustomerDTO resultado = service.findById(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());

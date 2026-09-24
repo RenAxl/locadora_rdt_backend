@@ -1,7 +1,6 @@
 package com.locadora_rdt_backend.modules.identity.roles.service;
 
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDTO;
-import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleInsertDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RolePermissionsUpdateDTO;
 import com.locadora_rdt_backend.modules.identity.roles.model.Role;
@@ -12,7 +11,7 @@ public interface RoleService {
 
     Page<RoleDTO> findAllPaged(String authority, PageRequest pageRequest);
 
-    RoleDetailsDTO findById(Long id);
+    RoleDTO findById(Long id);
 
     RoleDTO updateRolePermissions(Long roleId, RolePermissionsUpdateDTO dto);
 

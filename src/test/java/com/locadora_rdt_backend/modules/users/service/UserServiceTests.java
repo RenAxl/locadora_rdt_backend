@@ -3,7 +3,6 @@ package com.locadora_rdt_backend.modules.users.service;
 import com.locadora_rdt_backend.common.exception.DatabaseException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserDTO;
-import com.locadora_rdt_backend.modules.identity.users.dto.UserDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserInsertDTO;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserPhotoDTO;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserUpdateDTO;
@@ -103,13 +102,13 @@ public class UserServiceTests {
 
     @Test
     void findByIdShouldReturnUser() {
-        UserDetailsDTO detailsDTO = new UserDetailsDTO();
+        UserDTO detailsDTO = new UserDTO();
         detailsDTO.setId(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(mapper.toDetailsDTO(user)).thenReturn(detailsDTO);
+        when(mapper.toDTO(user)).thenReturn(detailsDTO);
 
-        UserDetailsDTO resultado = service.findById(1L);
+        UserDTO resultado = service.findById(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());

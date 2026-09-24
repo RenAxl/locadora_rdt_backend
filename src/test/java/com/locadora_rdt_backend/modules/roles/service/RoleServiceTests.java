@@ -4,7 +4,6 @@ import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import com.locadora_rdt_backend.modules.identity.permissions.model.Permission;
 import com.locadora_rdt_backend.modules.identity.permissions.service.PermissionService;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDTO;
-import com.locadora_rdt_backend.modules.identity.roles.dto.RoleDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RoleInsertDTO;
 import com.locadora_rdt_backend.modules.identity.roles.dto.RolePermissionsUpdateDTO;
 import com.locadora_rdt_backend.modules.identity.roles.mapper.RoleMapper;
@@ -91,14 +90,14 @@ public class RoleServiceTests {
 
     @Test
     void findByIdShouldReturnRole() {
-        RoleDetailsDTO detailsDTO = new RoleDetailsDTO();
+        RoleDTO detailsDTO = new RoleDTO();
         detailsDTO.setId(1L);
         detailsDTO.setAuthority("ROLE_ADMIN");
 
         when(repository.findById(1L)).thenReturn(Optional.of(role));
-        when(mapper.toDetailsDTO(role)).thenReturn(detailsDTO);
+        when(mapper.toDTO(role)).thenReturn(detailsDTO);
 
-        RoleDetailsDTO resultado = service.findById(1L);
+        RoleDTO resultado = service.findById(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());

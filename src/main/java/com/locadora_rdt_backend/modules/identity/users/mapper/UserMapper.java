@@ -1,7 +1,6 @@
 package com.locadora_rdt_backend.modules.identity.users.mapper;
 
 import com.locadora_rdt_backend.modules.identity.users.dto.UserDTO;
-import com.locadora_rdt_backend.modules.identity.users.dto.UserDetailsDTO;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserInsertDTO;
 import com.locadora_rdt_backend.modules.identity.users.dto.UserUpdateDTO;
 import com.locadora_rdt_backend.modules.identity.users.model.User;
@@ -18,25 +17,6 @@ public class UserMapper {
     public UserDTO toDTO(User entity) {
 
         UserDTO dto = new UserDTO();
-
-        dto.setRoles(entity.getRoles().stream().map(role -> role.getAuthority()).collect(Collectors.toList()));
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setEmail(entity.getEmail());
-
-        dto.setActive(entity.getActive());
-
-        dto.setTelephone(entity.getTelephone());
-        dto.setAddress(entity.getAddress());
-
-        dto.setPhotoContentType(entity.getPhotoContentType());
-
-        return dto;
-    }
-
-    public UserDetailsDTO toDetailsDTO(User entity) {
-
-        UserDetailsDTO dto = new UserDetailsDTO();
 
         dto.setId(entity.getId());
         dto.setName(entity.getName());

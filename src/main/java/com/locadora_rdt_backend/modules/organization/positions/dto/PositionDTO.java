@@ -1,20 +1,20 @@
-package com.locadora_rdt_backend.modules.organization.departments.dto;
+package com.locadora_rdt_backend.modules.organization.positions.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-public class DepartmentDetailsDTO implements Serializable {
+public class PositionDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    private Long version;
     private String name;
-    private String description;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    public DepartmentDetailsDTO() {
+    public PositionDTO() {
     }
 
     public Long getId() {
@@ -25,20 +25,20 @@ public class DepartmentDetailsDTO implements Serializable {
         this.id = id;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Instant getCreatedAt() {
@@ -72,4 +72,5 @@ public class DepartmentDetailsDTO implements Serializable {
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
+
 }

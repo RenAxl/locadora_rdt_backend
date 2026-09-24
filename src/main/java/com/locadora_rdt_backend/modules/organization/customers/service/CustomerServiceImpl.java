@@ -53,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public CustomerDetailsDTO findById(Long id) {
+    public CustomerDTO findById(Long id) {
 
         Optional<Customer> customerOptional = repository.findById(id);
 
@@ -63,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerOptional.get();
 
-        CustomerDetailsDTO customerDTO = mapper.toDetailsDTO(customer);
+        CustomerDTO customerDTO = mapper.toDTO(customer);
 
         return customerDTO;
     }
