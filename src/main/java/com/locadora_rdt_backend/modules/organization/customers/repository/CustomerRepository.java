@@ -14,34 +14,48 @@ import java.util.List;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
+    @Query(value = "SELECT COUNT(*) FROM tb_customer WHERE active = true", nativeQuery = true)
     long countByActiveTrue();
 
     @Query(
-            value = "SELECT customer FROM Customer customer WHERE customer.name LIKE CONCAT('%', :name, '%')"
+            value = "SELECT * FROM tb_customer WHERE name LIKE CONCAT('%', :name, '%')",
+            countQuery = "SELECT COUNT(*) FROM tb_customer WHERE name LIKE CONCAT('%', :name, '%')",
+            nativeQuery = true
     )
     Page<Customer> find(@Param("name") String name, Pageable pageable);
 
-    boolean existsByCpf(String cpf);
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM tb_customer WHERE cpf IS NOT DISTINCT FROM :cpf)",
+            nativeQuery = true)
+    boolean existsByCpf(@Param("cpf") String cpf);
 
-    boolean existsByEmail(String email);
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM tb_customer WHERE email IS NOT DISTINCT FROM :email)",
+            nativeQuery = true)
+    boolean existsByEmail(@Param("email") String email);
 
-    boolean existsByPhone(String phone);
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM tb_customer WHERE phone IS NOT DISTINCT FROM :phone)",
+            nativeQuery = true)
+    boolean existsByPhone(@Param("phone") String phone);
 
-    Customer findByCpf(String cpf);
+    @Query(value = "SELECT * FROM tb_customer WHERE cpf IS NOT DISTINCT FROM :cpf", nativeQuery = true)
+    Customer findByCpf(@Param("cpf") String cpf);
 
-    Customer findByEmail(String email);
+    @Query(value = "SELECT * FROM tb_customer WHERE email IS NOT DISTINCT FROM :email", nativeQuery = true)
+    Customer findByEmail(@Param("email") String email);
 
-    Customer findByPhone(String phone);
+    @Query(value = "SELECT * FROM tb_customer WHERE phone IS NOT DISTINCT FROM :phone", nativeQuery = true)
+    Customer findByPhone(@Param("phone") String phone);
 
     @Modifying
     @Query(
-            value = "DELETE FROM Customer customer WHERE customer.id IN :ids"
+            value = "DELETE FROM tb_customer WHERE id IN (:ids)",
+            nativeQuery = true
     )
     void deleteAllByIds(@Param("ids") List<Long> ids);
 
     @Modifying
     @Query(
-            value = "UPDATE Customer customer SET customer.active = :active WHERE customer.id = :id"
+            value = "UPDATE tb_customer SET active = :active WHERE id = :id",
+            nativeQuery = true
     )
     int updateActiveById(
             @Param("id") Long id,

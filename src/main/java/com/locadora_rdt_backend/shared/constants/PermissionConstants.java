@@ -12,10 +12,22 @@ public class PermissionConstants {
     public static final String USER_PROFILE_READ = "hasAuthority('USER_PROFILE_READ')";
     public static final String USER_PROFILE_WRITE = "hasAuthority('USER_PROFILE_WRITE')";
 
+    // roles
+    public static final String ROLE_READ = "hasAuthority('ROLE_READ')";
+    public static final String ROLE_WRITE = "hasAuthority('ROLE_WRITE')";
+
+    // permissions
+    public static final String PERMISSION_READ = "hasAuthority('PERMISSION_READ')";
+
     // customers
     public static final String CUSTOMER_READ = "hasAuthority('CUSTOMER_READ')";
     public static final String CUSTOMER_WRITE = "hasAuthority('CUSTOMER_WRITE')";
     public static final String CUSTOMER_DELETE = "hasAuthority('CUSTOMER_DELETE')";
+
+    // suppliers
+    public static final String SUPPLIER_READ = "hasAuthority('SUPPLIER_READ')";
+    public static final String SUPPLIER_WRITE = "hasAuthority('SUPPLIER_WRITE')";
+    public static final String SUPPLIER_DELETE = "hasAuthority('SUPPLIER_DELETE')";
 
     // positions
     public static final String POSITION_READ = "hasAuthority('POSITION_READ')";
@@ -26,13 +38,6 @@ public class PermissionConstants {
     public static final String DEPARTMENT_READ = "hasAuthority('DEPARTMENT_READ')";
     public static final String DEPARTMENT_WRITE = "hasAuthority('DEPARTMENT_WRITE')";
     public static final String DEPARTMENT_DELETE = "hasAuthority('DEPARTMENT_DELETE')";
-
-    // roles
-    public static final String ROLE_READ = "hasAuthority('ROLE_READ')";
-    public static final String ROLE_WRITE = "hasAuthority('ROLE_WRITE')";
-
-    // permissions
-    public static final String PERMISSION_READ = "hasAuthority('PERMISSION_READ')";
 
     // system_settings
     public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
