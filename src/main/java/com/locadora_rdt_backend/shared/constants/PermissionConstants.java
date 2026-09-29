@@ -29,6 +29,11 @@ public class PermissionConstants {
     public static final String SUPPLIER_WRITE = "hasAuthority('SUPPLIER_WRITE')";
     public static final String SUPPLIER_DELETE = "hasAuthority('SUPPLIER_DELETE')";
 
+    // employees
+    public static final String EMPLOYEE_READ = "hasAuthority('EMPLOYEE_READ')";
+    public static final String EMPLOYEE_WRITE = "hasAuthority('EMPLOYEE_WRITE')";
+    public static final String EMPLOYEE_DELETE = "hasAuthority('EMPLOYEE_DELETE')";
+
     // positions
     public static final String POSITION_READ = "hasAuthority('POSITION_READ')";
     public static final String POSITION_WRITE = "hasAuthority('POSITION_WRITE')";
