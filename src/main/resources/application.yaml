@@ -13,7 +13,7 @@ spring:
     properties:
       mail:
         smtp:
-          auth: true
+          auth: trueonde
           starttls:
             enable: true
 
