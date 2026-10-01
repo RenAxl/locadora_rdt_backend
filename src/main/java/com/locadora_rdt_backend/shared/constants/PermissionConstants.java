@@ -49,6 +49,11 @@ public class PermissionConstants {
     public static final String FREQUENCY_WRITE = "hasAuthority('FREQUENCY_WRITE')";
     public static final String FREQUENCY_DELETE = "hasAuthority('FREQUENCY_DELETE')";
 
+    // payment_methods
+    public static final String METHODS_READ = "hasAuthority('METHODS_READ')";
+    public static final String METHODS_WRITE = "hasAuthority('METHODS_WRITE')";
+    public static final String METHODS_DELETE = "hasAuthority('METHODS_DELETE')";
+
     // system_settings
     public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
     public static final String SYSTEM_SETTING_WRITE = "hasAuthority('SYSTEM_SETTING_WRITE')";
