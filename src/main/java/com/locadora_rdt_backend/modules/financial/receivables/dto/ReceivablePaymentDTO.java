@@ -1,6 +1,6 @@
-package com.locadora_rdt_backend.modules.financial.payables.dto;
+package com.locadora_rdt_backend.modules.financial.receivables.dto;
 
-import com.locadora_rdt_backend.modules.financial.payables.constants.PayableConstants;
+import com.locadora_rdt_backend.modules.financial.receivables.constants.ReceivableConstants;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
@@ -8,11 +8,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class PayablePaymentDTO implements Serializable {
+public class ReceivablePaymentDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = PayableConstants.PAYMENT_AMOUNT_REQUIRED)
-    @DecimalMin(value = PayableConstants.MINIMUM_AMOUNT, message = PayableConstants.PAYMENT_AMOUNT_POSITIVE_VALIDATION)
+    @NotNull(message = ReceivableConstants.PAYMENT_AMOUNT_REQUIRED)
+    @DecimalMin(value = ReceivableConstants.MINIMUM_AMOUNT, message = ReceivableConstants.PAYMENT_AMOUNT_POSITIVE_VALIDATION)
     private BigDecimal paymentAmount;
 
     private LocalDate paymentDate;
@@ -22,7 +22,7 @@ public class PayablePaymentDTO implements Serializable {
     private BigDecimal lateInterest;
     private BigDecimal lateFee;
 
-    public PayablePaymentDTO() {
+    public ReceivablePaymentDTO() {
     }
 
     public BigDecimal getPaymentAmount() {

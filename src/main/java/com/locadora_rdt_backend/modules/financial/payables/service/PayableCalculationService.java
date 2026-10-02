@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -42,19 +40,13 @@ public class PayableCalculationService {
         return remainingBalance.compareTo(amount) < 0;
     }
 
-    public BigDecimal getDefaultDiscount(Payable payable, PaymentMethod paymentMethod) {
-        if (paymentMethod == null || paymentMethod.getName() == null) {
+    public BigDecimal getPaymentMethodFee(Payable payable, PaymentMethod paymentMethod) {
+        if (paymentMethod == null) {
             return PayableConstants.ZERO;
         }
 
-        String name = Normalizer.normalize(paymentMethod.getName(), Normalizer.Form.NFD);
-        name = name.replaceAll("\\p{M}", "").trim().toLowerCase(Locale.ROOT);
-
-        if (name.equals("pix") || name.equals("boleto bancario")) {
-            return percentageOf(valueOrZero(payable.getAmount()), PayableConstants.DEFAULT_DISCOUNT_PERCENT);
-        }
-
-        return PayableConstants.ZERO;
+        BigDecimal openAmount = getOpenAmount(payable);
+        return percentageOf(openAmount, paymentMethod.getFee());
     }
 
     public BigDecimal getCurrentPaymentLimit(Payable payable, PayablePaymentDTO dto) {
@@ -62,7 +54,6 @@ public class PayableCalculationService {
         limit = limit.add(valueOrZero(dto.getFee()));
         limit = limit.add(valueOrZero(dto.getLateInterest()));
         limit = limit.add(valueOrZero(dto.getLateFee()));
-        limit = limit.subtract(valueOrZero(dto.getDiscount()));
 
         return limit;
     }
@@ -94,11 +85,26 @@ public class PayableCalculationService {
         return amount;
     }
 
+    public BigDecimal getPaidAmount(Payable payable) {
+        BigDecimal subtotal = valueOrZero(payable.getSubtotal());
+        BigDecimal total = valueOrZero(payable.getAmount());
+
+        if (subtotal.compareTo(PayableConstants.ZERO) > 0) {
+            total = subtotal;
+        }
+
+        total = total.add(valueOrZero(payable.getFee()));
+        total = total.add(valueOrZero(payable.getLateInterest()));
+        total = total.add(valueOrZero(payable.getLateFee()));
+        total = total.subtract(valueOrZero(payable.getDiscount()));
+
+        return total.setScale(PayableConstants.MONEY_SCALE, RoundingMode.HALF_UP);
+    }
+
     public void fillLateCharges(Payable payable, PayableDTO dto) {
-        BigDecimal amount = valueOrZero(payable.getAmount()).setScale(PayableConstants.MONEY_SCALE, RoundingMode.HALF_UP);
         BigDecimal openAmount = getOpenAmount(payable).setScale(PayableConstants.MONEY_SCALE, RoundingMode.HALF_UP);
         if (Boolean.TRUE.equals(payable.getPaid())) {
-            dto.setCurrentAmountWithLateCharges(amount);
+            dto.setCurrentAmountWithLateCharges(getPaidAmount(payable));
         } else {
             dto.setCurrentAmountWithLateCharges(openAmount);
         }

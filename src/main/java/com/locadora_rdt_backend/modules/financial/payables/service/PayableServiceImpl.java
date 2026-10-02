@@ -192,6 +192,15 @@ public class PayableServiceImpl implements PayableService {
     public PayableDTO pay(Long id, PayablePaymentDTO dto) {
         Payable payable = findPayableById(id);
 
+        PaymentMethod requestedPaymentMethod = findPaymentMethod(dto.getPaymentMethodId());
+        PaymentMethod paymentMethod = requestedPaymentMethod;
+
+        if (paymentMethod == null) {
+            paymentMethod = payable.getPaymentMethod();
+        }
+
+        dto.setFee(calculationService.getPaymentMethodFee(payable, paymentMethod));
+
         BigDecimal paymentAmount = calculationService.valueOrZero(dto.getPaymentAmount());
         validatePayment(payable, dto, paymentAmount);
 
@@ -199,8 +208,7 @@ public class PayableServiceImpl implements PayableService {
         BigDecimal amount = calculationService.valueOrZero(payable.getAmount());
         BigDecimal openAmount = calculationService.getOpenAmount(payable);
         BigDecimal paidAmount = amount.subtract(openAmount);
-        PaymentMethod requestedPaymentMethod = findPaymentMethod(dto.getPaymentMethodId());
-        validatePaymentCharges(payable, dto, requestedPaymentMethod);
+        validatePaymentCharges(payable, dto);
         BigDecimal paymentLimit = calculationService.getCurrentPaymentLimit(payable, dto);
 
         if (paymentAmount.compareTo(paymentLimit) == 0 || paymentAmount.compareTo(openAmount) >= 0) {
@@ -231,7 +239,7 @@ public class PayableServiceImpl implements PayableService {
         payable.setFee(calculationService.valueOrZero(dto.getFee()));
         payable.setLateInterest(calculationService.valueOrZero(dto.getLateInterest()));
         payable.setLateFee(calculationService.valueOrZero(dto.getLateFee()));
-        payable.setDiscount(calculationService.valueOrZero(dto.getDiscount()));
+        payable.setDiscount(PayableConstants.ZERO);
         payable.setUpdatedBy(user);
 
         Payable savedPayable = repository.save(payable);
@@ -282,6 +290,11 @@ public class PayableServiceImpl implements PayableService {
     private PayableDTO toDTOWithLateCharges(Payable payable) {
         PayableDTO dto = mapper.toDTO(payable);
         calculationService.fillLateCharges(payable, dto);
+
+        if (Boolean.TRUE.equals(payable.getPaid())) {
+            dto.setSubtotal(dto.getCurrentAmountWithLateCharges());
+        }
+
         return dto;
     }
 
@@ -423,19 +436,13 @@ public class PayableServiceImpl implements PayableService {
         }
     }
 
-    private void validatePaymentCharges(Payable payable, PayablePaymentDTO dto, PaymentMethod paymentMethod) {
+    private void validatePaymentCharges(Payable payable, PayablePaymentDTO dto) {
         if (calculationService.isOverdueOpenPayable(payable)) {
             return;
         }
 
-        if (paymentMethod == null) {
-            paymentMethod = payable.getPaymentMethod();
-        }
-
-        BigDecimal discount = calculationService.getDefaultDiscount(payable, paymentMethod);
         if (calculationService.valueOrZero(dto.getLateFee()).compareTo(PayableConstants.ZERO) != 0
-                || calculationService.valueOrZero(dto.getLateInterest()).compareTo(PayableConstants.ZERO) != 0
-                || calculationService.valueOrZero(dto.getDiscount()).compareTo(discount) != 0) {
+                || calculationService.valueOrZero(dto.getLateInterest()).compareTo(PayableConstants.ZERO) != 0) {
             throw new IllegalArgumentException(PayableConstants.NON_OVERDUE_CHARGES_CANNOT_BE_EDITED);
         }
     }
@@ -464,7 +471,7 @@ public class PayableServiceImpl implements PayableService {
         payable.setFee(calculationService.valueOrZero(dto.getFee()));
         payable.setLateInterest(calculationService.valueOrZero(dto.getLateInterest()));
         payable.setLateFee(calculationService.valueOrZero(dto.getLateFee()));
-        payable.setDiscount(calculationService.valueOrZero(dto.getDiscount()));
+        payable.setDiscount(PayableConstants.ZERO);
         payable.setRemainingBalance(PayableConstants.ZERO);
         payable.setPaidBy(user);
         payable.setUpdatedBy(user);

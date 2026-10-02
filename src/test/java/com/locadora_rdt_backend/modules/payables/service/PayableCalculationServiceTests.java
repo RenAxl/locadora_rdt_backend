@@ -1,9 +1,9 @@
 package com.locadora_rdt_backend.modules.payables.service;
 
 import com.locadora_rdt_backend.modules.financial.payables.dto.PayableDTO;
+import com.locadora_rdt_backend.modules.financial.payables.dto.PayablePaymentDTO;
 import com.locadora_rdt_backend.modules.financial.payables.model.Payable;
 import com.locadora_rdt_backend.modules.financial.payables.service.PayableCalculationService;
-import com.locadora_rdt_backend.modules.financial.payment_methods.model.PaymentMethod;
 import com.locadora_rdt_backend.modules.settings.financial_settings.constants.FinancialSettingConstants;
 import com.locadora_rdt_backend.modules.settings.financial_settings.model.FinancialSetting;
 import com.locadora_rdt_backend.modules.settings.financial_settings.repository.FinancialSettingRepository;
@@ -106,16 +106,13 @@ public class PayableCalculationServiceTests {
     }
 
     @Test
-    void discountShouldRecognizeBoletoWithAccentsAndRoundToCents() {
-        payable.setAmount(new BigDecimal("20.10"));
-        PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setName(" Boleto Bancário ");
+    void newPaymentShouldUseTheFullBalanceWithoutReusingStoredDiscount() {
+        payable.setDiscount(new BigDecimal("5.00"));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setLateFee(new BigDecimal("2.00"));
+        payment.setLateInterest(new BigDecimal("3.00"));
 
-        assertEquals(new BigDecimal("1.01"), service.getDefaultDiscount(payable, paymentMethod));
-
-        paymentMethod.setName("Dinheiro");
-        assertEquals(BigDecimal.ZERO, service.getDefaultDiscount(payable, paymentMethod));
-        assertEquals(BigDecimal.ZERO, service.getDefaultDiscount(payable, null));
+        assertEquals(new BigDecimal("105.00"), service.getCurrentPaymentLimit(payable, payment));
     }
 
     @Test

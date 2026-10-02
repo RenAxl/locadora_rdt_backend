@@ -32,6 +32,8 @@ import com.locadora_rdt_backend.shared.security.AuthenticationFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -254,6 +256,7 @@ public class PayableServiceTests {
         employee.setId(3L);
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setId(4L);
+        paymentMethod.setFee(new BigDecimal("3.00"));
         PaymentFrequency paymentFrequency = new PaymentFrequency();
         paymentFrequency.setId(5L);
 
@@ -368,9 +371,9 @@ public class PayableServiceTests {
         paymentDTO.setFee(new BigDecimal("3.00"));
         paymentDTO.setLateInterest(new BigDecimal("2.00"));
         paymentDTO.setLateFee(new BigDecimal("4.00"));
-        paymentDTO.setDiscount(new BigDecimal("1.00"));
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setId(4L);
+        paymentMethod.setFee(new BigDecimal("3.00"));
 
         when(repository.findById(1L)).thenReturn(Optional.of(payable));
         when(paymentMethodRepository.findById(4L)).thenReturn(Optional.of(paymentMethod));
@@ -390,7 +393,7 @@ public class PayableServiceTests {
         assertEquals(new BigDecimal("3.00"), payable.getFee());
         assertEquals(new BigDecimal("2.00"), payable.getLateInterest());
         assertEquals(new BigDecimal("4.00"), payable.getLateFee());
-        assertEquals(new BigDecimal("1.00"), payable.getDiscount());
+        assertEquals(BigDecimal.ZERO, payable.getDiscount());
         assertEquals(user, payable.getUpdatedBy());
         assertNull(payable.getPaidBy());
         verify(repository).save(payable);
@@ -400,15 +403,13 @@ public class PayableServiceTests {
     void payShouldRejectManualChargesForNonOverduePayable() {
         when(repository.findById(1L)).thenReturn(Optional.of(payable));
 
-        for (int field = 0; field < 3; field++) {
+        for (int field = 0; field < 2; field++) {
             PayablePaymentDTO payment = new PayablePaymentDTO();
             payment.setPaymentAmount(new BigDecimal("10.00"));
             if (field == 0) {
                 payment.setLateFee(new BigDecimal("2.00"));
-            } else if (field == 1) {
-                payment.setLateInterest(new BigDecimal("2.00"));
             } else {
-                payment.setDiscount(new BigDecimal("2.00"));
+                payment.setLateInterest(new BigDecimal("2.00"));
             }
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -434,16 +435,15 @@ public class PayableServiceTests {
         verify(repository, never()).save(any());
     }
 
-    @Test
-    void payShouldAcceptAutomaticPixDiscountForNonOverduePayable() {
+    @ParameterizedTest
+    @ValueSource(strings = {"Pix", "Boleto Bancário"})
+    void payShouldSettlePixAndBoletoWithoutDiscount(String methodName) {
         PaymentMethod method = new PaymentMethod();
         method.setId(1L);
-        method.setName("Pix");
+        method.setName(methodName);
         PayablePaymentDTO payment = new PayablePaymentDTO();
-        payment.setPaymentAmount(new BigDecimal("95.00"));
+        payment.setPaymentAmount(new BigDecimal("100.00"));
         payment.setPaymentMethodId(1L);
-        payment.setDiscount(new BigDecimal("5.00"));
-
         when(repository.findById(1L)).thenReturn(Optional.of(payable));
         when(paymentMethodRepository.findById(1L)).thenReturn(Optional.of(method));
         when(repository.save(payable)).thenReturn(payable);
@@ -452,10 +452,11 @@ public class PayableServiceTests {
         PayableDTO result = service.pay(1L, payment);
 
         assertTrue(result.getPaid());
-        assertEquals(new BigDecimal("5.00"), result.getDiscount());
-        assertEquals(0, result.getLateFee().compareTo(BigDecimal.ZERO));
-        assertEquals(0, result.getLateInterest().compareTo(BigDecimal.ZERO));
+        assertEquals(BigDecimal.ZERO, result.getDiscount());
+        assertEquals(new BigDecimal("100.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
         assertEquals(0, result.getRemainingBalance().compareTo(BigDecimal.ZERO));
+        assertEquals(method, payable.getPaymentMethod());
     }
 
     @Test
@@ -546,4 +547,160 @@ public class PayableServiceTests {
         assertThrows(DataAccessResourceFailureException.class,
                 () -> service.report("Aluguel", null, null, "ALL", "DUE"));
     }
+    @Test
+    void fullPaymentShouldReturnCurrentAndPaidAmountsIncludingCharges() {
+        payable.setDueDate(LocalDate.now().minusDays(2));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentAmount(new BigDecimal("109.00"));
+        payment.setFee(new BigDecimal("999.00"));
+        payment.setPaymentMethodId(4L);
+        PaymentMethod paymentMethod = new PaymentMethod();
+        paymentMethod.setId(4L);
+        paymentMethod.setFee(new BigDecimal("3.00"));
+        when(paymentMethodRepository.findById(4L)).thenReturn(Optional.of(paymentMethod));
+        payment.setLateInterest(new BigDecimal("2.00"));
+        payment.setLateFee(new BigDecimal("4.00"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(repository.save(payable)).thenReturn(payable);
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.pay(1L, payment);
+
+        assertTrue(result.getPaid());
+        assertEquals(new BigDecimal("3.00"), result.getFee());
+        assertEquals(new BigDecimal("100.00"), result.getAmount());
+        assertEquals(new BigDecimal("109.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+        assertEquals(0, result.getRemainingBalance().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void findByIdShouldPreserveDiscountOnPreviouslySettledAccount() {
+        payable.setPaid(true);
+        payable.setSubtotal(new BigDecimal("100.00"));
+        payable.setRemainingBalance(BigDecimal.ZERO);
+        payable.setDiscount(new BigDecimal("5.00"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.findById(1L);
+
+        assertEquals(new BigDecimal("95.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+        assertEquals(new BigDecimal("100.00"), result.getOriginalAmount());
+        assertEquals(new BigDecimal("5.00"), result.getDiscount());
+    }
+
+    @Test
+    void settlementAfterPartialPaymentShouldIncludePreviousPaymentAndFinalCharges() {
+        payable.setDueDate(LocalDate.now().minusDays(2));
+        payable.setPaymentDate(LocalDate.now().minusDays(1));
+        payable.setSubtotal(new BigDecimal("40.00"));
+        payable.setRemainingBalance(new BigDecimal("60.00"));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentAmount(new BigDecimal("69.00"));
+        payment.setLateInterest(new BigDecimal("4.00"));
+        payment.setLateFee(new BigDecimal("5.00"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(repository.save(payable)).thenReturn(payable);
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.pay(1L, payment);
+
+        assertTrue(result.getPaid());
+        assertEquals(new BigDecimal("109.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+        assertEquals(0, result.getRemainingBalance().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void payShouldIncludeRegisteredMethodFeeBeforeDueDate() {
+        PaymentMethod method = new PaymentMethod();
+        method.setId(4L);
+        method.setFee(new BigDecimal("3.00"));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentMethodId(4L);
+        payment.setPaymentAmount(new BigDecimal("103.00"));
+        payment.setFee(BigDecimal.ZERO);
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(paymentMethodRepository.findById(4L)).thenReturn(Optional.of(method));
+        when(repository.save(payable)).thenReturn(payable);
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.pay(1L, payment);
+        method.setFee(new BigDecimal("10.00"));
+        PayableDTO savedResult = service.findById(1L);
+
+        assertTrue(result.getPaid());
+        assertEquals(new BigDecimal("3.00"), result.getFee());
+        assertEquals(new BigDecimal("103.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+        assertEquals(new BigDecimal("3.00"), savedResult.getFee());
+        assertEquals(new BigDecimal("103.00"), savedResult.getSubtotal());
+        assertEquals(BigDecimal.ZERO, result.getDiscount());
+    }
+
+    @Test
+    void payShouldCalculateMethodFeeOnOutstandingBalanceAfterPartialPayment() {
+        payable.setPaymentDate(LocalDate.now().minusDays(1));
+        payable.setSubtotal(new BigDecimal("40.00"));
+        payable.setRemainingBalance(new BigDecimal("60.00"));
+        PaymentMethod method = new PaymentMethod();
+        method.setFee(new BigDecimal("5.00"));
+        payable.setPaymentMethod(method);
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentAmount(new BigDecimal("63.00"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(repository.save(payable)).thenReturn(payable);
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.pay(1L, payment);
+
+        assertTrue(result.getPaid());
+        assertEquals(new BigDecimal("3.00"), result.getFee());
+        assertEquals(new BigDecimal("103.00"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+        assertEquals(0, result.getRemainingBalance().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void payShouldRoundMethodFeeToCents() {
+        payable.setAmount(new BigDecimal("20.10"));
+        payable.setRemainingBalance(new BigDecimal("20.10"));
+        PaymentMethod method = new PaymentMethod();
+        method.setId(4L);
+        method.setFee(new BigDecimal("5.00"));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentMethodId(4L);
+        payment.setPaymentAmount(new BigDecimal("21.11"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(paymentMethodRepository.findById(4L)).thenReturn(Optional.of(method));
+        when(repository.save(payable)).thenReturn(payable);
+        when(mapper.toDTO(payable)).thenCallRealMethod();
+
+        PayableDTO result = service.pay(1L, payment);
+
+        assertTrue(result.getPaid());
+        assertEquals(new BigDecimal("1.01"), result.getFee());
+        assertEquals(new BigDecimal("21.11"), result.getSubtotal());
+        assertEquals(result.getSubtotal(), result.getCurrentAmountWithLateCharges());
+    }
+
+    @Test
+    void payShouldRejectAnAmountAboveTheRegisteredMethodFee() {
+        PaymentMethod method = new PaymentMethod();
+        method.setId(4L);
+        method.setFee(new BigDecimal("3.00"));
+        PayablePaymentDTO payment = new PayablePaymentDTO();
+        payment.setPaymentMethodId(4L);
+        payment.setPaymentAmount(new BigDecimal("104.00"));
+        payment.setFee(new BigDecimal("999.00"));
+        when(repository.findById(1L)).thenReturn(Optional.of(payable));
+        when(paymentMethodRepository.findById(4L)).thenReturn(Optional.of(method));
+
+        assertThrows(IllegalArgumentException.class, () -> service.pay(1L, payment));
+
+        verify(repository, never()).save(any());
+    }
+
 }

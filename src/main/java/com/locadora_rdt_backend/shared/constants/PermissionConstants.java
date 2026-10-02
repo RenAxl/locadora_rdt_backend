@@ -59,6 +59,11 @@ public class PermissionConstants {
     public static final String PAYABLE_WRITE = "hasAuthority('PAYABLE_WRITE')";
     public static final String PAYABLE_DELETE = "hasAuthority('PAYABLE_DELETE')";
 
+    // receivables
+    public static final String RECEIVABLE_READ = "hasAuthority('RECEIVABLE_READ')";
+    public static final String RECEIVABLE_WRITE = "hasAuthority('RECEIVABLE_WRITE')";
+    public static final String RECEIVABLE_DELETE = "hasAuthority('RECEIVABLE_DELETE')";
+
     // system_settings
     public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
     public static final String SYSTEM_SETTING_WRITE = "hasAuthority('SYSTEM_SETTING_WRITE')";
