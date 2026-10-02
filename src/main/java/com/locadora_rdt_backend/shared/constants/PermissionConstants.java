@@ -64,6 +64,9 @@ public class PermissionConstants {
     public static final String RECEIVABLE_WRITE = "hasAuthority('RECEIVABLE_WRITE')";
     public static final String RECEIVABLE_DELETE = "hasAuthority('RECEIVABLE_DELETE')";
 
+    // financial_reports
+    public static final String FINANCIAL_REPORTS_READ = "hasAuthority('FINANCIAL_REPORTS_READ')";
+
     // system_settings
     public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
     public static final String SYSTEM_SETTING_WRITE = "hasAuthority('SYSTEM_SETTING_WRITE')";
