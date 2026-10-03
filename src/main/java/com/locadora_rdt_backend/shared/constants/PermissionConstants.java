@@ -76,6 +76,11 @@ public class PermissionConstants {
     public static final String CATEGORY_WRITE = "hasAuthority('CATEGORY_WRITE')";
     public static final String CATEGORY_DELETE = "hasAuthority('CATEGORY_DELETE')";
 
+    // items
+    public static final String ITEM_READ = "hasAuthority('ITEM_READ')";
+    public static final String ITEM_WRITE = "hasAuthority('ITEM_WRITE')";
+    public static final String ITEM_DELETE = "hasAuthority('ITEM_DELETE')";
+
     // financial_settings
     public static final String FINANCIAL_SETTINGS_READ = "hasAuthority('FINANCIAL_SETTINGS_READ')";
     public static final String FINANCIAL_SETTINGS_WRITE = "hasAuthority('FINANCIAL_SETTINGS_WRITE')";
