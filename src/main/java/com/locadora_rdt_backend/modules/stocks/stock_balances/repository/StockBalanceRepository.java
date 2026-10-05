@@ -29,6 +29,14 @@ public interface StockBalanceRepository extends JpaRepository<StockBalance, Long
             nativeQuery = true)
     Optional<StockBalance> findByItemId(@Param("itemId") Long itemId);
 
+    @Query(value = "SELECT * FROM tb_stock_balance WHERE item_id = :itemId FOR UPDATE", nativeQuery = true)
+    Optional<StockBalance> findByItemIdForUpdate(@Param("itemId") Long itemId);
+
+    @Query(value = "SELECT balance.* FROM tb_stock_balance balance "
+            + "JOIN tb_item_unit unit ON unit.item_id = balance.item_id "
+            + "WHERE unit.id = :unitId FOR UPDATE OF balance", nativeQuery = true)
+    Optional<StockBalance> findByItemUnitIdForUpdate(@Param("unitId") Long unitId);
+
     @Query(value = "SELECT * FROM tb_stock_balance WHERE id = :id FOR UPDATE", nativeQuery = true)
     Optional<StockBalance> findByIdForUpdate(@Param("id") Long id);
 }

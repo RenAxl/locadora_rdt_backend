@@ -1,8 +1,8 @@
 package com.locadora_rdt_backend.modules.stocks.stock_balances.service;
 
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
-import com.locadora_rdt_backend.modules.stocks.items.model.ItemUnit;
-import com.locadora_rdt_backend.modules.stocks.items.repository.ItemUnitRepository;
+import com.locadora_rdt_backend.modules.stocks.item_units.model.ItemUnit;
+import com.locadora_rdt_backend.modules.stocks.item_units.repository.ItemUnitRepository;
 import com.locadora_rdt_backend.modules.stocks.stock_balances.constants.StockBalanceConstants;
 import com.locadora_rdt_backend.modules.stocks.stock_balances.dto.*;
 import com.locadora_rdt_backend.modules.stocks.stock_balances.mapper.StockBalanceMapper;

@@ -1,72 +1,44 @@
-package com.locadora_rdt_backend.modules.stocks.items.model;
+package com.locadora_rdt_backend.modules.stocks.item_units.dto;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import com.locadora_rdt_backend.modules.stocks.items.dto.ItemDTO;
+
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Objects;
 
-@Entity
-@Table(name = "tb_item_unit")
-public class ItemUnit implements Serializable {
+import java.io.Serializable;
+
+public class ItemUnitDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    @Column(nullable = false)
     private Long version;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    private ItemDTO item;
 
-    @Column(name = "asset_code", unique = true, nullable = false, length = 60)
     private String assetCode;
 
-    @Column(name = "serial_number", unique = true, length = 100)
     private String serialNumber;
 
-    @Column(nullable = false, length = 30)
     private String status;
 
-    @Column(name = "condition_status", nullable = false, length = 30)
     private String conditionStatus;
 
-    @Column(name = "purchase_date")
     private LocalDate purchaseDate;
 
-    @Column(length = 500)
     private String notes;
 
-    @Column(nullable = false)
-    private Boolean active;
+    private Boolean active = true;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @Column(name = "created_by", nullable = false, updatable = false, length = 100)
     private String createdBy;
 
-    @Column(name = "updated_by", length = 100)
     private String updatedBy;
 
-    public ItemUnit() {
-    }
-
-    @PrePersist
-    public void prePersist() {
-        createdAt = Instant.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = Instant.now();
+    public ItemUnitDTO() {
     }
 
     public Long getId() {
@@ -85,11 +57,11 @@ public class ItemUnit implements Serializable {
         this.version = version;
     }
 
-    public Item getItem() {
+    public ItemDTO getItem() {
         return item;
     }
 
-    public void setItem(Item item) {
+    public void setItem(ItemDTO item) {
         this.item = item;
     }
 
@@ -179,17 +151,5 @@ public class ItemUnit implements Serializable {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        ItemUnit itemUnit = (ItemUnit) o;
-        return Objects.equals(id, itemUnit.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }
