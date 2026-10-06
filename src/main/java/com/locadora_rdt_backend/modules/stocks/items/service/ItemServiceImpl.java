@@ -11,6 +11,8 @@ import com.locadora_rdt_backend.modules.stocks.items.dto.*;
 import com.locadora_rdt_backend.modules.stocks.items.mapper.ItemMapper;
 import com.locadora_rdt_backend.modules.stocks.items.model.Item;
 import com.locadora_rdt_backend.modules.stocks.items.repository.ItemRepository;
+import com.locadora_rdt_backend.modules.stocks.stock_balances.model.StockBalance;
+import com.locadora_rdt_backend.modules.stocks.stock_balances.repository.StockBalanceRepository;
 import com.locadora_rdt_backend.shared.security.AuthenticationFacade;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -34,17 +36,20 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper mapper;
     private final CategoryRepository categoryRepository;
     private final AuthenticationFacade authenticationFacade;
+    private final StockBalanceRepository stockBalanceRepository;
 
     public ItemServiceImpl(
             ItemRepository repository,
             ItemMapper mapper,
             CategoryRepository categoryRepository,
-            AuthenticationFacade authenticationFacade
+            AuthenticationFacade authenticationFacade,
+            StockBalanceRepository stockBalanceRepository
     ) {
         this.repository = repository;
         this.mapper = mapper;
         this.categoryRepository = categoryRepository;
         this.authenticationFacade = authenticationFacade;
+        this.stockBalanceRepository = stockBalanceRepository;
     }
 
     @Override
@@ -95,11 +100,21 @@ public class ItemServiceImpl implements ItemService {
 
         Category category = categoryOptional.get();
 
+        if (!category.getActive()) {
+            throw new DatabaseException("Não é possível cadastrar um item em uma categoria inativa");
+        }
+
         item.setCategory(category);
 
         item.setCreatedBy(authenticationFacade.getAuthenticatedUsername());
 
         Item savedItem = repository.save(item);
+
+        StockBalance balance = new StockBalance();
+        balance.setItem(savedItem);
+        balance.setMinimumQuantity(0);
+        balance.setCreatedBy(authenticationFacade.getAuthenticatedUsername());
+        stockBalanceRepository.save(balance);
 
         ItemDTO itemDTO = mapper.toDTO(savedItem);
 
@@ -122,6 +137,10 @@ public class ItemServiceImpl implements ItemService {
 
             Category category = categoryOptional.get();
 
+            if (!category.getActive() && !category.getId().equals(item.getCategory().getId())) {
+                throw new DatabaseException("Não é possível selecionar uma categoria inativa");
+            }
+
             mapper.updateEntity(item, dto);
             item.setCategory(category);
 
@@ -143,6 +162,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public void delete(Long id) {
         try {
+            deleteBalance(id);
             repository.deleteById(id);
             repository.flush();
         } catch (EmptyResultDataAccessException e) {
@@ -174,6 +194,10 @@ public class ItemServiceImpl implements ItemService {
 
         try {
 
+            for (Long id : ids) {
+                deleteBalance(id);
+            }
+
             repository.deleteAllByIds(ids);
             repository.flush();
 
@@ -183,13 +207,22 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    private void deleteBalance(Long itemId) {
+        Optional<StockBalance> balanceOptional = stockBalanceRepository.findByItemId(itemId);
+
+        if (balanceOptional.isPresent()) {
+            stockBalanceRepository.delete(balanceOptional.get());
+            stockBalanceRepository.flush();
+        }
+    }
+
     @Override
     @Transactional
     public void changeActiveStatus(Long id, boolean active) {
 
         try {
 
-            int updated = repository.updateActiveById(id, active);
+            int updated = repository.updateActiveById(id, active, authenticationFacade.getAuthenticatedUsername());
 
             if (updated == 0) {
                 throw new ResourceNotFoundException(ItemConstants.ITEM_NOT_FOUND);

@@ -164,7 +164,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         try {
 
-            int updated = repository.updateActiveById(id, active);
+            int updated = repository.updateActiveById(id, active, authenticationFacade.getAuthenticatedUsername());
 
             if (updated == 0) {
                 throw new ResourceNotFoundException(CategoryConstants.CATEGORY_NOT_FOUND);

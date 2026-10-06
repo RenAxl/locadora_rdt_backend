@@ -28,14 +28,16 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     )
     void deleteAllByIds(@Param("ids") List<Long> ids);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
-            value = "UPDATE tb_category SET active = :active WHERE id = :id",
+            value = "UPDATE tb_category SET active = :active, updated_at = CURRENT_TIMESTAMP, "
+                    + "updated_by = :updatedBy, version = version + 1 WHERE id = :id",
             nativeQuery = true
     )
     int updateActiveById(
             @Param("id") Long id,
-            @Param("active") boolean active
+            @Param("active") boolean active,
+            @Param("updatedBy") String updatedBy
     );
 
 }

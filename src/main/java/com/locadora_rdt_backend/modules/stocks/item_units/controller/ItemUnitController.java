@@ -29,6 +29,7 @@ public class ItemUnitController {
     public ResponseEntity<Page<ItemUnitDTO>> findAllPaged(
             @RequestParam(value = "name", defaultValue = "") String name,
             @RequestParam(value = "itemId", defaultValue = "-1") Long itemId,
+            @RequestParam(value = "active", required = false) Boolean active,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "10") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
@@ -36,7 +37,7 @@ public class ItemUnitController {
 
         PageRequest pageRequest = ControllerResponseBuilder.pageRequest(page, linesPerPage, direction, orderBy);
 
-        Page<ItemUnitDTO> list = service.findAllPaged(name.trim(), itemId, pageRequest);
+        Page<ItemUnitDTO> list = service.findAllPaged(name.trim(), itemId, active, pageRequest);
 
         return ResponseEntity.ok().body(list);
     }
@@ -84,4 +85,17 @@ public class ItemUnitController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize(ITEM_UNIT_WRITE)
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ItemUnitDTO> updateStatus(@PathVariable Long id,
+                                                   @Valid @RequestBody ItemUnitStatusUpdateDTO dto) {
+        return ResponseEntity.ok().body(service.updateStatus(id, dto));
+    }
+
+    @PreAuthorize(ITEM_UNIT_WRITE)
+    @PatchMapping("/{id}/maintenance")
+    public ResponseEntity<ItemUnitDTO> changeMaintenance(@PathVariable Long id, @RequestBody boolean maintenance) {
+        ItemUnitDTO dto = service.changeMaintenanceStatus(id, maintenance);
+        return ResponseEntity.ok().body(dto);
+    }
 }

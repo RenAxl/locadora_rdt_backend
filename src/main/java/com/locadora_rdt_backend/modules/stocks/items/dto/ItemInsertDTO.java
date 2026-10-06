@@ -25,7 +25,6 @@ public class ItemInsertDTO implements Serializable {
     @NotNull(message = ItemConstants.FIELD_REQUIRED)
     private Long categoryId;
 
-    @NotNull(message = ItemConstants.FIELD_REQUIRED)
     @DecimalMin(value = ItemConstants.MINIMUM_PRICE, message = ItemConstants.PRICE_MINIMUM)
     private BigDecimal price;
 

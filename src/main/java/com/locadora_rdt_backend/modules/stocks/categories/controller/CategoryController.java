@@ -17,7 +17,7 @@ import java.util.List;
 import static com.locadora_rdt_backend.shared.constants.PermissionConstants.*;
 
 @RestController
-@RequestMapping(value = "/rental/categories")
+@RequestMapping(value = {"/inventory/categories", "/rental/categories"})
 public class CategoryController {
 
     private final CategoryService service;

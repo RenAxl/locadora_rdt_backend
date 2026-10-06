@@ -15,51 +15,50 @@ import java.util.Optional;
 public interface ItemUnitRepository extends JpaRepository<ItemUnit, Long> {
 
     @Query(
-            value = "SELECT unit.*, unit.asset_code AS assetCode, unit.serial_number AS serialNumber, "
+            value = "SELECT unit.*, unit.asset_code AS assetCode, "
                     + "unit.condition_status AS conditionStatus, unit.purchase_date AS purchaseDate, "
                     + "unit.created_at AS createdAt, unit.updated_at AS updatedAt, "
                     + "unit.created_by AS createdBy, unit.updated_by AS updatedBy "
                     + "FROM tb_item_unit unit JOIN tb_item item ON item.id = unit.item_id "
                     + "WHERE (LOWER(unit.asset_code) LIKE LOWER('%' || :name || '%') "
                     + "OR LOWER(item.name) LIKE LOWER('%' || :name || '%')) "
-                    + "AND (:itemId = -1 OR unit.item_id = :itemId)",
+                    + "AND (:itemId = -1 OR unit.item_id = :itemId) "
+                    + "AND (:active = -1 OR unit.active = (:active = 1))",
             countQuery = "SELECT COUNT(*) FROM tb_item_unit unit JOIN tb_item item ON item.id = unit.item_id "
                     + "WHERE (LOWER(unit.asset_code) LIKE LOWER('%' || :name || '%') "
                     + "OR LOWER(item.name) LIKE LOWER('%' || :name || '%')) "
-                    + "AND (:itemId = -1 OR unit.item_id = :itemId)",
+                    + "AND (:itemId = -1 OR unit.item_id = :itemId) "
+                    + "AND (:active = -1 OR unit.active = (:active = 1))",
             nativeQuery = true
     )
-    Page<ItemUnit> find(@Param("name") String name, @Param("itemId") Long itemId, Pageable pageable);
+    Page<ItemUnit> find(@Param("name") String name, @Param("itemId") Long itemId,
+                        @Param("active") Integer active, Pageable pageable);
 
     @Query(value = "SELECT * FROM tb_item_unit WHERE id = :id FOR UPDATE", nativeQuery = true)
     Optional<ItemUnit> findByIdForUpdate(@Param("id") Long id);
 
     @Query(value = "SELECT COUNT(*) FROM tb_item_unit "
-            + "WHERE item_id IS NOT DISTINCT FROM :itemId "
-            + "AND status IS NOT DISTINCT FROM :status AND active = true", nativeQuery = true)
-    long countByItemIdAndStatusAndActiveTrue(@Param("itemId") Long itemId, @Param("status") String status);
-
-    @Query(value = "SELECT COUNT(*) FROM tb_item_unit "
             + "WHERE item_id IS NOT DISTINCT FROM :itemId AND active = true", nativeQuery = true)
     long countByItemIdAndActiveTrue(@Param("itemId") Long itemId);
 
-    @Query(value = "SELECT COUNT(*) FROM tb_item_unit "
-            + "WHERE item_id = :itemId AND active = true "
-            + "AND status NOT IN ('AVAILABLE', 'RESERVED')", nativeQuery = true)
-    long countUnavailableByItemId(@Param("itemId") Long itemId);
+    @Query(value = "SELECT COUNT(*) AS \"totalQuantity\", "
+            + "COUNT(*) FILTER (WHERE unit.status = 'AVAILABLE' AND item.active = true AND category.active = true) AS \"availableQuantity\", "
+            + "COUNT(*) FILTER (WHERE unit.status = 'UNAVAILABLE' OR "
+            + "(unit.status = 'AVAILABLE' AND (item.active = false OR category.active = false))) AS \"unavailableQuantity\", "
+            + "COUNT(*) FILTER (WHERE unit.status = 'MAINTENANCE') AS \"maintenanceQuantity\", "
+            + "COUNT(*) FILTER (WHERE unit.status = 'DAMAGED') AS \"damagedQuantity\", "
+            + "COUNT(*) FILTER (WHERE unit.status = 'LOST') AS \"lostQuantity\" "
+            + "FROM tb_item_unit unit JOIN tb_item item ON item.id = unit.item_id "
+            + "JOIN tb_category category ON category.id = item.category_id "
+            + "WHERE unit.item_id = :itemId AND unit.active = true", nativeQuery = true)
+    StockQuantitySummary summarizeByItemId(@Param("itemId") Long itemId);
 
     @Query(value = "SELECT unit.* FROM tb_item_unit unit "
-            + "WHERE unit.item_id = :itemId AND unit.active = true ORDER BY unit.id FOR UPDATE OF unit",
-            nativeQuery = true)
-    List<ItemUnit> findActiveByItemIdForUpdate(@Param("itemId") Long itemId);
-
-    @Query(value = "SELECT unit.* FROM tb_item_unit unit "
-            + "WHERE unit.item_id = :itemId AND unit.status = :status AND unit.active = true "
-            + "AND NOT EXISTS (SELECT 1 FROM tb_rental_item_unit link "
-            + "WHERE link.item_unit_id = unit.id AND link.status IN ('RESERVED', 'DELIVERED')) "
-            + "ORDER BY unit.id LIMIT :limit OFFSET :offset FOR UPDATE OF unit", nativeQuery = true)
-    List<ItemUnit> findByStatusForUpdate(@Param("itemId") Long itemId,
-                                        @Param("status") String status,
-                                        @Param("limit") Integer limit,
-                                        @Param("offset") long offset);
+            + "JOIN tb_item item ON item.id = unit.item_id "
+            + "JOIN tb_category category ON category.id = item.category_id "
+            + "WHERE unit.item_id = :itemId AND unit.status = 'AVAILABLE' AND unit.active = true "
+            + "AND item.active = true AND category.active = true "
+            + "ORDER BY unit.id LIMIT :quantity FOR UPDATE OF unit", nativeQuery = true)
+    List<ItemUnit> findAvailableByItemIdForUpdate(@Param("itemId") Long itemId,
+                                                 @Param("quantity") Integer quantity);
 }

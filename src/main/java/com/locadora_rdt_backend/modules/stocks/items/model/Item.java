@@ -32,7 +32,7 @@ public class Item implements Serializable {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal price;
 
     @Lob

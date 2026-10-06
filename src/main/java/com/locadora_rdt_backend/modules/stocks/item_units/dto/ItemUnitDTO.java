@@ -1,5 +1,7 @@
 package com.locadora_rdt_backend.modules.stocks.item_units.dto;
 
+import com.locadora_rdt_backend.modules.stocks.item_units.enums.ItemUnitStatus;
+import com.locadora_rdt_backend.modules.stocks.item_units.enums.ItemUnitCondition;
 import com.locadora_rdt_backend.modules.stocks.items.dto.ItemDTO;
 
 import java.time.Instant;
@@ -18,11 +20,9 @@ public class ItemUnitDTO implements Serializable {
 
     private String assetCode;
 
-    private String serialNumber;
+    private ItemUnitStatus status;
 
-    private String status;
-
-    private String conditionStatus;
+    private ItemUnitCondition conditionStatus;
 
     private LocalDate purchaseDate;
 
@@ -73,27 +73,19 @@ public class ItemUnitDTO implements Serializable {
         this.assetCode = assetCode;
     }
 
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public String getStatus() {
+    public ItemUnitStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ItemUnitStatus status) {
         this.status = status;
     }
 
-    public String getConditionStatus() {
+    public ItemUnitCondition getConditionStatus() {
         return conditionStatus;
     }
 
-    public void setConditionStatus(String conditionStatus) {
+    public void setConditionStatus(ItemUnitCondition conditionStatus) {
         this.conditionStatus = conditionStatus;
     }
 

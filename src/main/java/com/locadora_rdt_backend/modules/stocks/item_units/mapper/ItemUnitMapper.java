@@ -1,6 +1,6 @@
 package com.locadora_rdt_backend.modules.stocks.item_units.mapper;
 
-import com.locadora_rdt_backend.modules.stocks.item_units.constants.ItemUnitConstants;
+import com.locadora_rdt_backend.modules.stocks.item_units.enums.ItemUnitStatus;
 import com.locadora_rdt_backend.modules.stocks.item_units.dto.ItemUnitDTO;
 import com.locadora_rdt_backend.modules.stocks.item_units.dto.ItemUnitInsertDTO;
 import com.locadora_rdt_backend.modules.stocks.item_units.dto.ItemUnitUpdateDTO;
@@ -29,7 +29,6 @@ public class ItemUnitMapper {
         }
 
         dto.setAssetCode(entity.getAssetCode());
-        dto.setSerialNumber(entity.getSerialNumber());
         dto.setStatus(entity.getStatus());
         dto.setConditionStatus(entity.getConditionStatus());
         dto.setPurchaseDate(entity.getPurchaseDate());
@@ -47,18 +46,10 @@ public class ItemUnitMapper {
 
         ItemUnit entity = new ItemUnit();
 
-        entity.setAssetCode(dto.getAssetCode().trim());
-        String serialNumber = null;
-
-        if (dto.getSerialNumber() != null && !dto.getSerialNumber().trim().isEmpty()) {
-            serialNumber = dto.getSerialNumber().trim();
-        }
-
-        entity.setSerialNumber(serialNumber);
         entity.setConditionStatus(dto.getConditionStatus());
         entity.setPurchaseDate(dto.getPurchaseDate());
         entity.setNotes(dto.getNotes());
-        entity.setStatus(ItemUnitConstants.STATUS_AVAILABLE);
+        entity.setStatus(ItemUnitStatus.AVAILABLE);
         entity.setActive(true);
 
         return entity;
@@ -66,14 +57,6 @@ public class ItemUnitMapper {
 
     public void updateEntity(ItemUnit entity, ItemUnitUpdateDTO dto) {
 
-        entity.setAssetCode(dto.getAssetCode().trim());
-        String serialNumber = null;
-
-        if (dto.getSerialNumber() != null && !dto.getSerialNumber().trim().isEmpty()) {
-            serialNumber = dto.getSerialNumber().trim();
-        }
-
-        entity.setSerialNumber(serialNumber);
         entity.setConditionStatus(dto.getConditionStatus());
         entity.setPurchaseDate(dto.getPurchaseDate());
         entity.setNotes(dto.getNotes());

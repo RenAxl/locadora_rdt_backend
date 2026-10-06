@@ -1,5 +1,7 @@
 package com.locadora_rdt_backend.modules.stocks.item_units.model;
 
+import com.locadora_rdt_backend.modules.stocks.item_units.enums.ItemUnitStatus;
+import com.locadora_rdt_backend.modules.stocks.item_units.enums.ItemUnitCondition;
 import com.locadora_rdt_backend.modules.stocks.items.model.Item;
 
 import javax.persistence.*;
@@ -28,14 +30,13 @@ public class ItemUnit implements Serializable {
     @Column(name = "asset_code", unique = true, nullable = false, length = 60)
     private String assetCode;
 
-    @Column(name = "serial_number", unique = true, length = 100)
-    private String serialNumber;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private String status;
+    private ItemUnitStatus status;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "condition_status", nullable = false, length = 30)
-    private String conditionStatus;
+    private ItemUnitCondition conditionStatus;
 
     @Column(name = "purchase_date")
     private LocalDate purchaseDate;
@@ -103,27 +104,19 @@ public class ItemUnit implements Serializable {
         this.assetCode = assetCode;
     }
 
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public String getStatus() {
+    public ItemUnitStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ItemUnitStatus status) {
         this.status = status;
     }
 
-    public String getConditionStatus() {
+    public ItemUnitCondition getConditionStatus() {
         return conditionStatus;
     }
 
-    public void setConditionStatus(String conditionStatus) {
+    public void setConditionStatus(ItemUnitCondition conditionStatus) {
         this.conditionStatus = conditionStatus;
     }
 

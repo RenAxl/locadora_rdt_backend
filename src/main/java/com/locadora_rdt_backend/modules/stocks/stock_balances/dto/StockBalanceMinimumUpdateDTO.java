@@ -1,6 +1,8 @@
 package com.locadora_rdt_backend.modules.stocks.stock_balances.dto;
 
 import com.locadora_rdt_backend.modules.stocks.stock_balances.constants.StockBalanceConstants;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.locadora_rdt_backend.common.json.IntegerDeserializer;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -11,6 +13,7 @@ public class StockBalanceMinimumUpdateDTO implements Serializable {
 
     @NotNull(message = StockBalanceConstants.FIELD_REQUIRED)
     @Min(value = StockBalanceConstants.MINIMUM_QUANTITY, message = StockBalanceConstants.MINIMUM_QUANTITY_MINIMUM)
+    @JsonDeserialize(using = IntegerDeserializer.class)
     private Integer minimumQuantity;
 
     public StockBalanceMinimumUpdateDTO() {

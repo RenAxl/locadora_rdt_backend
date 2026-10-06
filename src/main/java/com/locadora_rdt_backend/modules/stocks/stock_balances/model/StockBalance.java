@@ -24,15 +24,6 @@ public class StockBalance implements Serializable {
     @JoinColumn(name = "item_id", nullable = false, unique = true)
     private Item item;
 
-    @Column(name = "total_quantity", nullable = false)
-    private Integer totalQuantity;
-
-    @Column(name = "reserved_quantity", nullable = false)
-    private Integer reservedQuantity;
-
-    @Column(name = "unavailable_quantity", nullable = false)
-    private Integer unavailableQuantity;
-
     @Column(name = "minimum_quantity", nullable = false)
     private Integer minimumQuantity;
 
@@ -83,30 +74,6 @@ public class StockBalance implements Serializable {
 
     public void setItem(Item item) {
         this.item = item;
-    }
-
-    public Integer getTotalQuantity() {
-        return totalQuantity;
-    }
-
-    public void setTotalQuantity(Integer totalQuantity) {
-        this.totalQuantity = totalQuantity;
-    }
-
-    public Integer getReservedQuantity() {
-        return reservedQuantity;
-    }
-
-    public void setReservedQuantity(Integer reservedQuantity) {
-        this.reservedQuantity = reservedQuantity;
-    }
-
-    public Integer getUnavailableQuantity() {
-        return unavailableQuantity;
-    }
-
-    public void setUnavailableQuantity(Integer unavailableQuantity) {
-        this.unavailableQuantity = unavailableQuantity;
     }
 
     public Integer getMinimumQuantity() {

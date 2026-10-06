@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -40,6 +41,18 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                               @Param("categoryId") Long categoryId,
                               Pageable pageable);
 
+    @Query(value = "SELECT * FROM tb_item WHERE id = :id FOR UPDATE", nativeQuery = true)
+    Optional<Item> findByIdForUpdate(@Param("id") Long id);
+
+    @Query(value = "SELECT item.* FROM tb_item item JOIN tb_item_unit unit ON unit.item_id = item.id "
+            + "WHERE unit.id = :unitId FOR UPDATE OF item", nativeQuery = true)
+    Optional<Item> findByItemUnitIdForUpdate(@Param("unitId") Long unitId);
+
+    @Query(value = "SELECT item.* FROM tb_item item WHERE EXISTS "
+            + "(SELECT 1 FROM tb_item_unit unit WHERE unit.item_id = item.id AND unit.id IN (:ids)) "
+            + "ORDER BY item.id FOR UPDATE OF item", nativeQuery = true)
+    List<Item> findByItemUnitIdsForUpdate(@Param("ids") List<Long> ids);
+
     @Modifying
     @Query(
             value = "DELETE FROM tb_item WHERE id IN (:ids)",
@@ -47,14 +60,16 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     )
     void deleteAllByIds(@Param("ids") List<Long> ids);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
-            value = "UPDATE tb_item SET active = :active WHERE id = :id",
+            value = "UPDATE tb_item SET active = :active, updated_at = CURRENT_TIMESTAMP, "
+                    + "updated_by = :updatedBy, version = version + 1 WHERE id = :id",
             nativeQuery = true
     )
     int updateActiveById(
             @Param("id") Long id,
-            @Param("active") boolean active
+            @Param("active") boolean active,
+            @Param("updatedBy") String updatedBy
     );
 
 }

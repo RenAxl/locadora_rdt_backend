@@ -11,9 +11,11 @@ public class StockBalanceDTO implements Serializable {
     private Long itemId;
     private String itemName;
     private Integer totalQuantity;
-    private Integer reservedQuantity;
     private Integer unavailableQuantity;
     private Integer availableQuantity;
+    private Integer maintenanceQuantity;
+    private Integer damagedQuantity;
+    private Integer lostQuantity;
     private Integer minimumQuantity;
     private Boolean lowStock;
 
@@ -66,14 +68,6 @@ public class StockBalanceDTO implements Serializable {
         this.totalQuantity = totalQuantity;
     }
 
-    public Integer getReservedQuantity() {
-        return reservedQuantity;
-    }
-
-    public void setReservedQuantity(Integer reservedQuantity) {
-        this.reservedQuantity = reservedQuantity;
-    }
-
     public Integer getUnavailableQuantity() {
         return unavailableQuantity;
     }
@@ -88,6 +82,30 @@ public class StockBalanceDTO implements Serializable {
 
     public void setAvailableQuantity(Integer availableQuantity) {
         this.availableQuantity = availableQuantity;
+    }
+
+    public Integer getMaintenanceQuantity() {
+        return maintenanceQuantity;
+    }
+
+    public void setMaintenanceQuantity(Integer maintenanceQuantity) {
+        this.maintenanceQuantity = maintenanceQuantity;
+    }
+
+    public Integer getDamagedQuantity() {
+        return damagedQuantity;
+    }
+
+    public void setDamagedQuantity(Integer damagedQuantity) {
+        this.damagedQuantity = damagedQuantity;
+    }
+
+    public Integer getLostQuantity() {
+        return lostQuantity;
+    }
+
+    public void setLostQuantity(Integer lostQuantity) {
+        this.lostQuantity = lostQuantity;
     }
 
     public Integer getMinimumQuantity() {

@@ -17,11 +17,11 @@ public final class ItemConstants {
     public static final int NAME_MAX_LENGTH = 100;
     public static final int DESCRIPTION_MIN_LENGTH = 3;
     public static final int DESCRIPTION_MAX_LENGTH = 500;
-    public static final String MINIMUM_PRICE = "0.01";
+    public static final String MINIMUM_PRICE = "0.00";
     public static final String FIELD_REQUIRED = "Campo requerido";
     public static final String NAME_LENGTH = "O nome deve ter entre 3 a 100 caracteres";
     public static final String DESCRIPTION_LENGTH = "A descrição deve ter entre 3 a 500 caracteres";
-    public static final String PRICE_MINIMUM = "O preço deve ser maior que zero";
+    public static final String PRICE_MINIMUM = "O preço não pode ser negativo";
 
     // Mensagens de erro
     public static final String ITEM_NOT_FOUND = "Item não encontrado";

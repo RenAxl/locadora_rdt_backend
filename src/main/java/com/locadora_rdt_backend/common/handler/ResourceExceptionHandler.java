@@ -11,6 +11,7 @@ import com.locadora_rdt_backend.common.exception.FileException;
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ResourceExceptionHandler {
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<StandardError> invalidRequest(HttpMessageNotReadableException e, HttpServletRequest request) {
+        StandardError err = new StandardError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(HttpStatus.BAD_REQUEST.value());
+        err.setError("Dados inválidos");
+        err.setMessage("Verifique os dados informados. As quantidades devem ser números inteiros.");
+        err.setPath(request.getRequestURI());
+        return ResponseEntity.badRequest().body(err);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
