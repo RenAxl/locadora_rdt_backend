@@ -67,6 +67,9 @@ public class PermissionConstants {
     // financial_reports
     public static final String FINANCIAL_REPORTS_READ = "hasAuthority('FINANCIAL_REPORTS_READ')";
 
+    // stock_reports
+    public static final String STOCK_REPORTS_READ = "hasAuthority('STOCK_REPORTS_READ')";
+
     // system_settings
     public static final String SYSTEM_SETTING_READ = "hasAuthority('SYSTEM_SETTING_READ')";
     public static final String SYSTEM_SETTING_WRITE = "hasAuthority('SYSTEM_SETTING_WRITE')";

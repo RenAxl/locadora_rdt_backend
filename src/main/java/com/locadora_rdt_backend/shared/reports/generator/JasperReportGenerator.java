@@ -35,8 +35,17 @@ import java.util.Map;
 public class JasperReportGenerator {
 
     public byte[] generateExcel(String title, List<String> columns, List<Map<String, ?>> rows) {
+        return generateExcelFile(title, columns, rows, false);
+    }
+
+    public byte[] generateExcel(String title, List<String> columns, List<Map<String, ?>> rows, boolean keepFullText) {
+        return generateExcelFile(title, columns, rows, keepFullText);
+    }
+
+    private byte[] generateExcelFile(String title, List<String> columns, List<Map<String, ?>> rows, boolean keepFullText) {
         try {
             JasperDesign design = createDesign(title, columns);
+            design.setProperty("net.sf.jasperreports.print.keep.full.text", String.valueOf(keepFullText));
             JasperReport report = JasperCompileManager.compileReport(design);
             Map<String, Object> params = new HashMap<>();
             params.put("REPORT_TITLE", title);
