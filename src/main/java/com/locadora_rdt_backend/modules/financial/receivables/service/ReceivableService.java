@@ -6,12 +6,9 @@ import com.locadora_rdt_backend.modules.financial.receivables.dto.ReceivableInse
 import com.locadora_rdt_backend.modules.financial.receivables.dto.ReceivablePaymentDTO;
 import com.locadora_rdt_backend.modules.financial.receivables.dto.ReceivableReportDTO;
 import com.locadora_rdt_backend.modules.financial.receivables.dto.ReceivableUpdateDTO;
-import com.locadora_rdt_backend.modules.financial.payment_methods.model.PaymentMethod;
-import com.locadora_rdt_backend.modules.organization.customers.model.Customer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface ReceivableService {
@@ -23,14 +20,6 @@ public interface ReceivableService {
     ReceivableDTO findById(Long id);
 
     ReceivableDTO insert(ReceivableInsertDTO dto);
-
-    void createFromRental(
-            Long rentalId,
-            String rentalNumber,
-            BigDecimal remainingAmount,
-            Customer customer,
-            PaymentMethod paymentMethod
-    );
 
     ReceivableDTO update(Long id, ReceivableUpdateDTO dto);
 

@@ -101,11 +101,4 @@ public interface ReceivableRepository extends JpaRepository<Receivable, Long> {
             Pageable pageable
     );
 
-    @Query(value = "SELECT EXISTS (SELECT 1 FROM tb_receivable "
-            + "WHERE reference IS NOT DISTINCT FROM :reference "
-            + "AND reference_id IS NOT DISTINCT FROM :referenceId)", nativeQuery = true)
-    boolean existsByReferenceAndReferenceId(
-            @Param("reference") String reference,
-            @Param("referenceId") Long referenceId
-    );
 }

@@ -110,4 +110,11 @@ public class PermissionConstants {
     public static final String RENTAL_TYPES_WRITE = "hasAuthority('RENTAL_TYPES_WRITE')";
     public static final String RENTAL_TYPES_DELETE = "hasAuthority('RENTAL_TYPES_DELETE')";
 
+    // Rentals
+    public static final String RENTAL_READ = "hasAuthority('RENTAL_READ')";
+    public static final String RENTAL_WRITE = "hasAuthority('RENTAL_WRITE')";
+    public static final String RENTAL_DELETE = "hasAuthority('RENTAL_DELETE')";
+    public static final String RENTAL_CUSTOMER = "hasAuthority('RENTAL_CUSTOMER')";
+    public static final String RENTAL_CATEGORY = "hasAuthority('RENTAL_CATEGORY')";
+
 }

@@ -56,12 +56,6 @@ public final class ReceivableConstants {
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_LINES_PER_PAGE = "10";
 
-    // Regras de negócio
-    public static final String CASH_PAYMENT_FREQUENCY = "À vista";
-    public static final String RENTAL_REFERENCE = "RENTAL";
-    public static final String RENTAL_DESCRIPTION_PREFIX = "Locação ";
-    public static final String RENTAL_NOTE = "Conta gerada automaticamente na baixa da locação.";
-
     // Documentos
     public static final Locale BRAZIL = new Locale("pt", "BR");
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -95,8 +89,6 @@ public final class ReceivableConstants {
     public static final String CUSTOMER_NOT_FOUND = "Cliente não encontrado. Id: ";
     public static final String PAYMENT_METHOD_NOT_FOUND = "Forma de pagamento não encontrada. Id: ";
     public static final String PAYMENT_FREQUENCY_NOT_FOUND = "Frequência não encontrada. Id: ";
-    public static final String CASH_PAYMENT_FREQUENCY_NOT_FOUND =
-            "Frequência de pagamento à vista não encontrada.";
     public static final String RECEIPT_ONLY_FOR_PAID_RECEIVABLE =
             "Recibo disponível apenas para contas pagas.";
     public static final String FISCAL_COUPON_ONLY_FOR_PAID_RECEIVABLE =

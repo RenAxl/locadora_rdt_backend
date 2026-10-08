@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -288,58 +287,6 @@ public class ReceivableServiceTests {
 
         assertThrows(ResourceNotFoundException.class, () -> service.insert(insertDTO));
 
-        verify(repository, never()).save(any());
-    }
-
-    @Test
-    void createFromRentalShouldSavePaidReceivableWithReferenceAndAudit() {
-        Customer customer = new Customer();
-        customer.setId(2L);
-        PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setId(4L);
-        paymentMethod.setFee(new BigDecimal("3.00"));
-        PaymentFrequency frequency = new PaymentFrequency();
-        frequency.setId(5L);
-        frequency.setFrequency("À VISTA");
-        Page<PaymentFrequency> frequencies = new PageImpl<>(Collections.singletonList(frequency));
-        BigDecimal remainingAmount = new BigDecimal("125.50");
-
-        when(repository.existsByReferenceAndReferenceId("RENTAL", 10L)).thenReturn(false);
-        when(paymentFrequencyRepository.find("À vista", Pageable.unpaged())).thenReturn(frequencies);
-        when(authenticationFacade.getAuthenticatedUsername()).thenReturn("usuario@email.com");
-        when(userRepository.findByEmail("usuario@email.com")).thenReturn(user);
-
-        service.createFromRental(10L, "LOC-10", remainingAmount, customer, paymentMethod);
-
-        ArgumentCaptor<Receivable> captor = ArgumentCaptor.forClass(Receivable.class);
-        verify(repository).save(captor.capture());
-        Receivable resultado = captor.getValue();
-
-        assertEquals("Locação LOC-10", resultado.getDescription());
-        assertEquals(remainingAmount, resultado.getAmount());
-        assertEquals(remainingAmount, resultado.getSubtotal());
-        assertEquals(BigDecimal.ZERO, resultado.getRemainingBalance());
-        assertEquals("RENTAL", resultado.getReference());
-        assertEquals(10L, resultado.getReferenceId());
-        assertEquals(customer, resultado.getCustomer());
-        assertEquals(paymentMethod, resultado.getPaymentMethod());
-        assertEquals(frequency, resultado.getPaymentFrequency());
-        assertEquals(user, resultado.getCreatedBy());
-        assertEquals(user, resultado.getPaidBy());
-        assertEquals(LocalDate.now(), resultado.getDueDate());
-        assertEquals(resultado.getDueDate(), resultado.getPaymentDate());
-        assertTrue(resultado.getPaid());
-    }
-
-    @Test
-    void createFromRentalShouldThrowExceptionWhenCashFrequencyDoesNotExist() {
-        when(repository.existsByReferenceAndReferenceId("RENTAL", 10L)).thenReturn(false);
-        when(paymentFrequencyRepository.find("À vista", Pageable.unpaged())).thenReturn(Page.empty());
-
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-                () -> service.createFromRental(10L, "LOC-10", new BigDecimal("100.00"), null, null));
-
-        assertEquals(ReceivableConstants.CASH_PAYMENT_FREQUENCY_NOT_FOUND, exception.getMessage());
         verify(repository, never()).save(any());
     }
 

@@ -127,43 +127,6 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     @Override
     @Transactional
-    public void createFromRental(
-            Long rentalId,
-            String rentalNumber,
-            BigDecimal remainingAmount,
-            Customer customer,
-            PaymentMethod paymentMethod
-    ) {
-        if (repository.existsByReferenceAndReferenceId(ReceivableConstants.RENTAL_REFERENCE, rentalId)) {
-            return;
-        }
-
-        LocalDate paymentDate = LocalDate.now();
-        BigDecimal amount = calculationService.valueOrZero(remainingAmount);
-        User user = getAuthenticatedUser();
-
-        Receivable receivable = new Receivable();
-        receivable.setDescription(ReceivableConstants.RENTAL_DESCRIPTION_PREFIX + rentalNumber);
-        receivable.setAmount(amount);
-        receivable.setDueDate(paymentDate);
-        receivable.setPaymentDate(paymentDate);
-        receivable.setCustomer(customer);
-        receivable.setPaymentMethod(paymentMethod);
-        receivable.setPaymentFrequency(findCashPaymentFrequency());
-        receivable.setReference(ReceivableConstants.RENTAL_REFERENCE);
-        receivable.setReferenceId(rentalId);
-        receivable.setNote(ReceivableConstants.RENTAL_NOTE);
-        receivable.setPaid(true);
-        receivable.setSubtotal(amount);
-        receivable.setRemainingBalance(ReceivableConstants.ZERO);
-        receivable.setCreatedBy(user);
-        receivable.setPaidBy(user);
-
-        repository.save(receivable);
-    }
-
-    @Override
-    @Transactional
     public ReceivableDTO update(Long id, ReceivableUpdateDTO dto) {
         Receivable receivable = findReceivableById(id);
 
@@ -478,20 +441,6 @@ public class ReceivableServiceImpl implements ReceivableService {
         if (!hasCustomer && !hasDescription) {
             throw new IllegalArgumentException(ReceivableConstants.CUSTOMER_OR_DESCRIPTION_REQUIRED);
         }
-    }
-
-    private PaymentFrequency findCashPaymentFrequency() {
-        List<PaymentFrequency> frequencies = paymentFrequencyRepository.find(
-                ReceivableConstants.CASH_PAYMENT_FREQUENCY, Pageable.unpaged()
-        ).getContent();
-
-        for (PaymentFrequency frequency : frequencies) {
-            if (ReceivableConstants.CASH_PAYMENT_FREQUENCY.equalsIgnoreCase(frequency.getFrequency())) {
-                return frequency;
-            }
-        }
-
-        throw new ResourceNotFoundException(ReceivableConstants.CASH_PAYMENT_FREQUENCY_NOT_FOUND);
     }
 
     private void validatePayment(Receivable receivable, ReceivablePaymentDTO dto, BigDecimal paymentAmount) {
