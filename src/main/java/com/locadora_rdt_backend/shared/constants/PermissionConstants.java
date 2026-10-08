@@ -117,4 +117,7 @@ public class PermissionConstants {
     public static final String RENTAL_CUSTOMER = "hasAuthority('RENTAL_CUSTOMER')";
     public static final String RENTAL_CATEGORY = "hasAuthority('RENTAL_CATEGORY')";
 
+    // Rental History
+    public static final String RENTAL_HISTORY_READ = "hasAuthority('RENTAL_HISTORY_READ')";
+
 }
