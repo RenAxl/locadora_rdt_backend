@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.modules.rental.catalog.service;
+package com.locadora_rdt_backend.modules.rentals.catalog.service;
 
 import com.locadora_rdt_backend.common.exception.ResourceNotFoundException;
 import com.locadora_rdt_backend.modules.rentals.catalog.constants.CatalogConstants;
