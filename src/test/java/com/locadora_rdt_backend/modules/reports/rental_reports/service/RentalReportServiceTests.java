@@ -10,6 +10,8 @@ import com.locadora_rdt_backend.modules.reports.rental_reports.mapper.RentalRepo
 import com.locadora_rdt_backend.modules.reports.rental_reports.model.RentalReport;
 import com.locadora_rdt_backend.modules.reports.rental_reports.repository.RentalReportRepository;
 import com.locadora_rdt_backend.shared.reports.generator.JasperReportGenerator;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +24,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +32,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,6 +120,37 @@ public class RentalReportServiceTests {
     }
 
     @Test
+    void generateShouldReturnRentalsPdfFile() throws Exception {
+        filters.setStartDate(LocalDate.of(2026, 1, 1));
+        filters.setEndDate(LocalDate.of(2026, 12, 31));
+        when(repository.find("LOC", LocalDate.of(2026, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                LocalDate.of(2027, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                true, true, "ALL", "REGISTRATION_DATE", 3L, 4L, 6L,
+                BigDecimal.ZERO, new BigDecimal("200.00")))
+                .thenReturn(Collections.singletonList(rental));
+
+        RentalReportFileDTO resultado = service.generate("rentals", " PDF ", filters);
+
+        assertNotNull(resultado);
+        assertEquals("rentals.pdf", resultado.getFileName());
+        assertEquals(RentalReportConstants.PDF_CONTENT_TYPE, resultado.getContentType());
+        PdfReader reader = new PdfReader(resultado.getData());
+        try {
+            assertEquals(1, reader.getNumberOfPages());
+            String text = new PdfTextExtractor(reader).getTextFromPage(1).replaceAll("\\s+", " ");
+            assertTrue(text.contains(RentalReportConstants.RENTALS_REPORT_TITLE), text);
+            assertTrue(text.contains("LOC-001"), text);
+            assertTrue(text.contains("Entregue"), text);
+            assertTrue(text.contains("15/01/2026"), text);
+            assertTrue(text.contains("125,00"), text);
+            assertTrue(text.contains("Total"), text);
+        } finally {
+            reader.close();
+        }
+        verifyNoInteractions(mapper, reportGenerator);
+    }
+
+    @Test
     void generateShouldThrowExceptionWhenReportTypeIsInvalid() {
         DatabaseException exception = assertThrows(DatabaseException.class,
                 () -> service.generate("invalid", "pdf", filters));
@@ -152,6 +188,46 @@ public class RentalReportServiceTests {
         assertEquals(new BigDecimal("125.00"), report.getMonths().get(0).getPaidTotal());
         assertEquals(BigDecimal.ZERO, report.getMonths().get(11).getRentalTotal());
         assertEquals(" delivered ", filters.getStatus());
+    }
+
+    @Test
+    void comparisonShouldGroupByRentalStartDateAndExcludeUnpaidRentalsFromPaidTotals() {
+        filters.setPeriodType(" rental-start-date ");
+        rental.setRentalStartDate(LocalDate.of(2026, 2, 15).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Rental unpaidRental = new Rental();
+        unpaidRental.setRegistrationDate(LocalDate.of(2026, 3, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        unpaidRental.setRentalStartDate(LocalDate.of(2026, 2, 20).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        unpaidRental.setTotalAmount(new BigDecimal("50.00"));
+        unpaidRental.setLateFee(null);
+        unpaidRental.setDiscount(null);
+        unpaidRental.setPaid(false);
+        when(repository.find("LOC", LocalDate.of(2026, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                LocalDate.of(2027, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                true, true, "ALL", "RENTAL_START_DATE", 3L, 4L, 6L,
+                BigDecimal.ZERO, new BigDecimal("200.00")))
+                .thenReturn(Arrays.asList(rental, unpaidRental));
+        rentalReportDTO.setRentalTotal(new BigDecimal("175.00"));
+        when(mapper.toDTO(any(RentalReport.class))).thenReturn(rentalReportDTO);
+
+        RentalReportDTO resultado = service.comparison(filters);
+
+        assertEquals(rentalReportDTO, resultado);
+        ArgumentCaptor<RentalReport> reportCaptor = ArgumentCaptor.forClass(RentalReport.class);
+        verify(mapper).toDTO(reportCaptor.capture());
+        RentalReport report = reportCaptor.getValue();
+        assertEquals(new BigDecimal("175.00"), report.getRentalTotal());
+        assertEquals(new BigDecimal("125.00"), report.getPaidTotal());
+        assertEquals(2, report.getRentalCount());
+        assertEquals(1, report.getPaidCount());
+        assertEquals(2026, report.getYear());
+        assertEquals(12, report.getMonths().size());
+        assertEquals(BigDecimal.ZERO, report.getMonths().get(0).getRentalTotal());
+        assertEquals(BigDecimal.ZERO, report.getMonths().get(0).getPaidTotal());
+        assertEquals(new BigDecimal("175.00"), report.getMonths().get(1).getRentalTotal());
+        assertEquals(new BigDecimal("125.00"), report.getMonths().get(1).getPaidTotal());
+        assertEquals(BigDecimal.ZERO, report.getMonths().get(2).getRentalTotal());
+        assertEquals(BigDecimal.ZERO, report.getMonths().get(2).getPaidTotal());
+        assertEquals(" rental-start-date ", filters.getPeriodType());
     }
 
     @Test
