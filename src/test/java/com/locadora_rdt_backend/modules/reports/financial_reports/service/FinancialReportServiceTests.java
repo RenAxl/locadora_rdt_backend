@@ -1,4 +1,4 @@
-package com.locadora_rdt_backend.modules.reports.financial_reports;
+package com.locadora_rdt_backend.modules.reports.financial_reports.service;
 
 import com.locadora_rdt_backend.modules.financial.payables.model.Payable;
 import com.locadora_rdt_backend.modules.financial.receivables.model.Receivable;
@@ -11,7 +11,6 @@ import com.locadora_rdt_backend.modules.reports.financial_reports.model.Financia
 import com.locadora_rdt_backend.modules.reports.financial_reports.model.FinancialReportMonth;
 import com.locadora_rdt_backend.modules.reports.financial_reports.repository.FinancialReportPayableRepository;
 import com.locadora_rdt_backend.modules.reports.financial_reports.repository.FinancialReportReceivableRepository;
-import com.locadora_rdt_backend.modules.reports.financial_reports.service.FinancialReportServiceImpl;
 import com.locadora_rdt_backend.shared.reports.generator.JasperReportGenerator;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;

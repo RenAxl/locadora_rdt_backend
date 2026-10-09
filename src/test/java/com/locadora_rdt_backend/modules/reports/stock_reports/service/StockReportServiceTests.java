@@ -15,6 +15,8 @@ import com.locadora_rdt_backend.modules.reports.stock_reports.repository.StockRe
 import com.locadora_rdt_backend.modules.stocks.categories.model.Category;
 import com.locadora_rdt_backend.modules.stocks.items.model.Item;
 import com.locadora_rdt_backend.shared.reports.generator.JasperReportGenerator;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +86,63 @@ class StockReportServiceTests {
         assertEquals("5", row.get("column2"));
         assertEquals("2", row.get("column3"));
         assertEquals("Sim", row.get("column9"));
+    }
+
+    @Test
+    void generateShouldReturnPdfWhenNoBalancesFound() throws Exception {
+        when(balanceRepository.find("", -1L, -1L, -1)).thenReturn(Collections.emptyList());
+
+        StockReportFileDTO result = service.generate("balances", " PDF ", null);
+
+        assertEquals("balances.pdf", result.getFileName());
+        assertEquals(StockReportConstants.PDF_CONTENT_TYPE, result.getContentType());
+        PdfReader reader = new PdfReader(result.getData());
+        try {
+            assertEquals(1, reader.getNumberOfPages());
+            String text = new PdfTextExtractor(reader).getTextFromPage(1).replaceAll("\\s+", " ");
+            assertTrue(text.contains("Saldos atuais de estoque"), text);
+            assertTrue(text.contains("Nenhum registro encontrado."), text);
+        } finally {
+            reader.close();
+        }
+        verifyNoInteractions(unitRepository, movementRepository, mapper, reportGenerator);
+    }
+
+    @Test
+    void generateShouldIncludeOnlyItemsBelowMinimumStock() {
+        StockReportBalanceRow atMinimum = mock(StockReportBalanceRow.class);
+        StockReportBalanceRow aboveMinimum = mock(StockReportBalanceRow.class);
+        when(balanceRepository.find("Furadeira", 1L, 2L, 0))
+                .thenReturn(Arrays.asList(balance, atMinimum, aboveMinimum));
+        when(balance.getItemName()).thenReturn("Furadeira");
+        when(balance.getCategoryName()).thenReturn("Ferramentas");
+        when(balance.getTotalQuantity()).thenReturn(5L);
+        when(balance.getAvailableQuantity()).thenReturn(2L);
+        when(balance.getMinimumQuantity()).thenReturn(3);
+        when(atMinimum.getAvailableQuantity()).thenReturn(3L);
+        when(atMinimum.getMinimumQuantity()).thenReturn(3);
+        when(aboveMinimum.getAvailableQuantity()).thenReturn(4L);
+        when(aboveMinimum.getMinimumQuantity()).thenReturn(3);
+        byte[] data = new byte[] {1, 2, 3};
+        when(reportGenerator.generateExcel(eq("Estoque abaixo do mínimo"),
+                eq(StockReportConstants.BALANCE_COLUMNS), anyList(), eq(true))).thenReturn(data);
+
+        StockReportFileDTO result = service.generate("low-stock", "xlsx", filters);
+
+        assertEquals("low_stock.xlsx", result.getFileName());
+        assertEquals(StockReportConstants.XLSX_CONTENT_TYPE, result.getContentType());
+        assertArrayEquals(data, result.getData());
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Map<String, ?>>> captor = ArgumentCaptor.forClass(List.class);
+        verify(reportGenerator).generateExcel(eq("Estoque abaixo do mínimo"),
+                eq(StockReportConstants.BALANCE_COLUMNS), captor.capture(), eq(true));
+        assertEquals(1, captor.getValue().size());
+        Map<String, ?> row = captor.getValue().get(0);
+        assertEquals("Furadeira", row.get("column0"));
+        assertEquals("2", row.get("column3"));
+        assertEquals("3", row.get("column8"));
+        assertEquals("Sim", row.get("column9"));
+        verifyNoInteractions(unitRepository, movementRepository, mapper);
     }
 
     @Test
