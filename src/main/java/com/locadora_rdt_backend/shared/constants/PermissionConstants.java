@@ -123,4 +123,7 @@ public class PermissionConstants {
     // Rental_reports
     public static final String RENTAL_REPORTS_READ = "hasAuthority('RENTAL_REPORTS_READ')";
 
+    // Dashboard
+    public static final String DASHBOARD_READ = "hasAuthority('DASHBOARD_READ')";
+
 }
