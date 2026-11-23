@@ -1,3 +1,6 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   application:
     name: locadora_rdt_backend
@@ -13,7 +16,7 @@ spring:
     properties:
       mail:
         smtp:
-          auth: trueonde
+          auth: true
           starttls:
             enable: true
 

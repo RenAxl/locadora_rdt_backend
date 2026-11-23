@@ -1,0 +1,32 @@
+app:
+  frontend:
+    base-url: ${FRONTEND_BASE_URL}
+
+  mail:
+    enabled: ${APP_MAIL_ENABLED:false}
+
+spring:
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 0
+      schema: locadora_rdt
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+    hibernate:
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        default_schema: locadora_rdt
+        format_sql: false
+
+  sql:
+    init:
+      mode: never
